@@ -1,33 +1,37 @@
 const axios = require('axios');
+const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
 
-async function test() {
-  const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
-  const host = 'instagram-scraper-20251.p.rapidapi.com';
-  
-  // Try different endpoints for posts/media
-  const endpoints = [
-    { url: '/usermedia/', params: { username_or_id: 'funkopopsnews' } },
-    { url: '/user_media/', params: { username_or_id: 'funkopopsnews' } },
-    { url: '/posts/', params: { username_or_id: 'funkopopsnews' } },
-    { url: '/user_posts/', params: { username_or_id: 'funkopopsnews' } },
-    { url: '/media/', params: { username_or_id: 'funkopopsnews' } },
-  ];
-
-  for (const ep of endpoints) {
-    try {
-      const resp = await axios.get(`https://${host}${ep.url}`, {
-        params: ep.params,
-        headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
-        timeout: 10000,
-      });
-      console.log(`✅ ${ep.url} — Status: ${resp.status}, Keys: ${Object.keys(resp.data).join(', ')}`);
-      const items = resp.data.data?.items || resp.data.items || resp.data.data;
-      if (Array.isArray(items)) console.log(`   Found ${items.length} items`);
-      console.log(`   Sample: ${JSON.stringify(resp.data).slice(0, 300)}`);
-      return;
-    } catch (e) {
-      console.log(`❌ ${ep.url} — ${e.response?.status || e.message}`);
-    }
+// Try the most popular Instagram APIs with correct endpoints
+async function tryAPI(name, host, method, endpoint, params, body) {
+  try {
+    const opts = {
+      method: method || 'GET',
+      url: `https://${host}${endpoint}`,
+      headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
+      timeout: 15000,
+    };
+    if (params) opts.params = params;
+    if (body) { opts.data = body; opts.headers['Content-Type'] = 'application/x-www-form-urlencoded'; }
+    const r = await axios(opts);
+    console.log(`✅ ${name}: ${r.status}`, JSON.stringify(r.data).slice(0, 400));
+    return true;
+  } catch (e) {
+    console.log(`❌ ${name}: ${e.response?.status}`, JSON.stringify(e.response?.data || e.message).slice(0, 200));
+    return false;
   }
 }
-test();
+
+async function main() {
+  // Instagram Scraper API2 (most popular, 10K+ users)
+  await tryAPI('scraper-api2', 'instagram-scraper-api2.p.rapidapi.com', 'GET', '/v1/info', { username_or_id_or_url: 'instagram' });
+  
+  // Instagram Scraper by junioroangel
+  await tryAPI('junioroangel', 'instagram-scraper.p.rapidapi.com', 'GET', '/user_info', { username: 'instagram' });
+
+  // Instagram Looter2
+  await tryAPI('looter2', 'instagram-looter2.p.rapidapi.com', 'GET', '/profile', { username: 'instagram' });
+
+  // RocketAPI for Instagram  
+  await tryAPI('rocketapi', 'rocketapi-for-instagram.p.rapidapi.com', 'POST', '/instagram/user/get_info', null, 'username=instagram');
+}
+main();

@@ -1,32 +1,50 @@
 const axios = require('axios');
 const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
-const host = 'instagram-scraper-20251.p.rapidapi.com';
+const host = 'instagram120.p.rapidapi.com';
 
-async function tryEndpoint(path, params) {
+async function test() {
+  // Test posts endpoint
   try {
-    const resp = await axios.get(`https://${host}${path}`, {
-      params,
-      headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
-      timeout: 10000,
-    });
-    console.log(`✅ ${path} — ${resp.status} — ${JSON.stringify(resp.data).slice(0, 200)}`);
+    const r = await axios.post(`https://${host}/api/instagram/posts`, 
+      { username: 'instagram', maxId: '' },
+      { headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host, 'Content-Type': 'application/json' }, timeout: 15000 }
+    );
+    console.log('posts:', r.status, JSON.stringify(r.data).slice(0, 500));
   } catch (e) {
-    console.log(`❌ ${path} — ${e.response?.status || e.message}`);
+    console.log('posts FAIL:', e.response?.status, JSON.stringify(e.response?.data || e.message).slice(0, 300));
   }
-}
 
-async function main() {
-  // Try to discover all endpoints
-  const paths = [
-    '/userinfo/', '/stories/', '/post_info/', '/search_users/',
-    '/userposts/', '/user_posts/', '/feed/', '/user_feed/',
-    '/reels/', '/user_reels/', '/highlights/', '/followers/',
-    '/following/', '/comments/', '/likers/', '/tagged/',
-    '/explore/', '/hashtag/', '/location/',
-  ];
-  
-  for (const p of paths) {
-    await tryEndpoint(p, { username_or_id: 'funkopopsnews' });
+  // Try user info endpoint
+  try {
+    const r = await axios.post(`https://${host}/api/instagram/user_info`,
+      { username: 'instagram' },
+      { headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host, 'Content-Type': 'application/json' }, timeout: 15000 }
+    );
+    console.log('user_info:', r.status, JSON.stringify(r.data).slice(0, 500));
+  } catch (e) {
+    console.log('user_info FAIL:', e.response?.status, JSON.stringify(e.response?.data || e.message).slice(0, 300));
+  }
+
+  // Try search
+  try {
+    const r = await axios.post(`https://${host}/api/instagram/search`,
+      { query: 'instagram' },
+      { headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host, 'Content-Type': 'application/json' }, timeout: 15000 }
+    );
+    console.log('search:', r.status, JSON.stringify(r.data).slice(0, 500));
+  } catch (e) {
+    console.log('search FAIL:', e.response?.status, JSON.stringify(e.response?.data || e.message).slice(0, 300));
+  }
+
+  // Try stories
+  try {
+    const r = await axios.post(`https://${host}/api/instagram/stories`,
+      { username: 'instagram' },
+      { headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host, 'Content-Type': 'application/json' }, timeout: 15000 }
+    );
+    console.log('stories:', r.status, JSON.stringify(r.data).slice(0, 500));
+  } catch (e) {
+    console.log('stories FAIL:', e.response?.status, JSON.stringify(e.response?.data || e.message).slice(0, 300));
   }
 }
-main();
+test();

@@ -3,123 +3,87 @@ const UserAgent = require('user-agents');
 const config = require('../config');
 const cache = require('./cache');
 
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+const RAPIDAPI_HOST = 'instagram120.p.rapidapi.com';
+
 class InstagramService {
   constructor() {
     this.userAgent = new UserAgent();
   }
 
-  getHeaders() {
-    return {
-      'User-Agent': this.userAgent.toString(),
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.5',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Connection': 'keep-alive',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
-      'Sec-Fetch-Site': 'none',
-    };
-  }
-
-  // ─── Method 1: RapidAPI Instagram Scraper ───
-  async fetchViaRapidAPI(endpoint, params = {}) {
-    const apiKey = process.env.RAPIDAPI_KEY;
-    if (!apiKey || apiKey === 'your_rapidapi_key_here') return null;
-
-    const hosts = [
-      'instagram-scraper-api2.p.rapidapi.com',
-      'instagram-scraper-20251.p.rapidapi.com',
-      'instagram-bulk-profile-scrapper.p.rapidapi.com',
-    ];
-
-    for (const host of hosts) {
-      try {
-        const resp = await axios.get(`https://${host}/${endpoint}`, {
-          params,
-          headers: {
-            'X-RapidAPI-Key': apiKey,
-            'X-RapidAPI-Host': host,
-          },
-          timeout: 15000,
-        });
-        if (resp.status === 200 && resp.data) return resp.data;
-      } catch (e) {
-        console.log(`RapidAPI (${host}) failed: ${e.message}`);
-      }
+  // ─── Primary: instagram120 API (POST-based) ───
+  async apiCall(endpoint, body) {
+    if (!RAPIDAPI_KEY || RAPIDAPI_KEY === 'your_rapidapi_key_here') return null;
+    try {
+      const r = await axios.post(`https://${RAPIDAPI_HOST}/api/instagram/${endpoint}`, body, {
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': RAPIDAPI_HOST,
+          'Content-Type': 'application/json',
+        },
+        timeout: 15000,
+      });
+      if (r.status === 200 && r.data) return r.data;
+    } catch (e) {
+      console.log(`API ${endpoint} failed: ${e.response?.status || e.message}`);
     }
     return null;
   }
 
-  // ─── Method 2: Direct Instagram web scraping ───
-  async fetchViaScraping(username) {
-    const urls = [
-      `https://www.instagram.com/api/v1/users/web_profile_info/?username=${username}`,
-      `https://www.instagram.com/${username}/?__a=1&__d=dis`,
-      `https://i.instagram.com/api/v1/users/web_profile_info/?username=${username}`,
-    ];
-
-    for (const url of urls) {
-      try {
-        const resp = await axios.get(url, {
-          headers: {
-            ...this.getHeaders(),
-            'X-IG-App-ID': '936619743392459',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          timeout: 10000,
-        });
-        if (resp.status === 200 && resp.data) {
-          // Different response shapes depending on endpoint
-          const user = resp.data?.data?.user || resp.data?.graphql?.user || resp.data?.user;
-          if (user) return user;
-        }
-      } catch (e) {
-        console.log(`Direct scrape failed (${url.split('?')[0]}): ${e.message}`);
-      }
-    }
-    return null;
-  }
-
-  // ─── Get profile with multi-method fallback ───
+  // ─── Get profile ───
   async getProfile(username) {
     const cached = await cache.get('profile', username);
     if (cached) return cached;
 
     let profileData = null;
 
-    // Method 1: RapidAPI (profile info + posts in parallel)
+    // Try API: profile + posts in parallel
     try {
-      const [rapidProfile, rapidPosts] = await Promise.all([
-        this.fetchViaRapidAPI('userinfo/', { username_or_id: username }),
-        this.fetchViaRapidAPI('userposts/', { username_or_id: username }),
+      const [profileResp, postsResp] = await Promise.all([
+        this.apiCall('profile', { username }),
+        this.apiCall('posts', { username, maxId: '' }),
       ]);
-      if (rapidProfile && rapidProfile.data) {
-        // Merge posts into profile data so normalizer can find them
-        const mergedData = { ...rapidProfile.data };
-        if (rapidPosts && rapidPosts.data && rapidPosts.data.items) {
-          mergedData.items = rapidPosts.data.items;
-        }
-        profileData = this.normalizeRapidAPIProfile(mergedData);
+
+      if (profileResp && profileResp.result) {
+        const p = profileResp.result;
+        const posts = postsResp?.result?.edges || [];
+
+        profileData = {
+          id: p.id || p.pk,
+          username: p.username,
+          full_name: p.full_name || p.username,
+          biography: p.biography || p.bio || '',
+          profile_pic_url: p.profile_pic_url || '/images/default-avatar.svg',
+          profile_pic_url_hd: p.profile_pic_url_hd || p.hd_profile_pic_url_info?.url || p.profile_pic_url || '/images/default-avatar.svg',
+          followers_count: p.follower_count || p.edge_followed_by?.count || 0,
+          following_count: p.following_count || p.edge_follow?.count || 0,
+          posts_count: p.media_count || p.edge_owner_to_timeline_media?.count || 0,
+          is_verified: p.is_verified || false,
+          is_private: p.is_private || false,
+          external_url: p.external_url || '',
+          recent_posts: posts.slice(0, 12).map((item, i) => {
+            const node = item.node || item;
+            return {
+              id: node.id || node.pk || `post_${i}`,
+              shortcode: node.shortcode || node.code || `code_${i}`,
+              display_url: node.display_url || node.image_versions2?.candidates?.[0]?.url || node.thumbnail_src || `https://picsum.photos/400/400?random=${i}`,
+              thumbnail_url: node.thumbnail_src || node.thumbnail_url || node.display_url || `https://picsum.photos/300/300?random=${i}`,
+              is_video: node.is_video || node.media_type === 2,
+              likes_count: node.edge_liked_by?.count || node.like_count || 0,
+              comments_count: node.edge_media_to_comment?.count || node.comment_count || 0,
+              caption: node.edge_media_to_caption?.edges?.[0]?.node?.text || node.caption?.text || '',
+              timestamp: node.taken_at_timestamp || node.taken_at || (Date.now() / 1000 - i * 86400),
+            };
+          }),
+        };
       }
     } catch (e) {
-      console.log(`RapidAPI profile fetch failed: ${e.message}`);
+      console.log(`Profile fetch failed: ${e.message}`);
     }
 
-    // Method 2: Direct scraping
+    // Fallback to mock
     if (!profileData) {
-      try {
-        const scraped = await this.fetchViaScraping(username);
-        if (scraped) {
-          profileData = this.normalizeScrapedProfile(scraped);
-        }
-      } catch (e) {
-        console.log(`Direct scrape profile failed: ${e.message}`);
-      }
-    }
-
-    // Method 3: Mock data fallback (always fallback to keep site functional)
-    if (!profileData) {
-      console.log(`🎭 Using mock data for profile: ${username} (API unavailable)`);
+      console.log(`🎭 Using mock data for profile: ${username}`);
       profileData = this.getMockProfileData(username);
     }
 
@@ -133,15 +97,23 @@ class InstagramService {
 
     let storiesData = null;
 
-    // RapidAPI stories
     try {
-      const rapid = await this.fetchViaRapidAPI('stories/', { username_or_id: username });
-      if (rapid && rapid.data) {
-        storiesData = this.normalizeRapidAPIStories(rapid.data, username);
+      const resp = await this.apiCall('stories', { username });
+      if (resp && resp.result && Array.isArray(resp.result) && resp.result.length > 0) {
+        storiesData = {
+          user: { username, profile_pic_url: '/images/default-avatar.svg' },
+          stories: resp.result.map((s, i) => ({
+            id: s.id || s.pk || `story_${i}`,
+            display_url: s.image_versions2?.candidates?.[0]?.url || s.display_url || `https://picsum.photos/400/600?random=${i + 100}`,
+            is_video: s.media_type === 2 || s.is_video || false,
+            video_url: s.video_versions?.[0]?.url || null,
+            timestamp: s.taken_at || (Date.now() / 1000 - i * 3600),
+            expires_at: s.expiring_at || (Date.now() / 1000 + 86400),
+          })),
+        };
       }
     } catch (e) { /* fall through */ }
 
-    // Fallback to mock
     if (!storiesData) {
       storiesData = this.getMockStoriesData(username);
     }
@@ -154,19 +126,8 @@ class InstagramService {
     const cached = await cache.get('posts', shortcode);
     if (cached) return cached;
 
-    let postData = null;
-
-    try {
-      const rapid = await this.fetchViaRapidAPI('post_info/', { code_or_id_or_url: shortcode });
-      if (rapid && rapid.data) {
-        postData = this.normalizeRapidAPIPost(rapid.data);
-      }
-    } catch (e) { /* fall through */ }
-
-    if (!postData) {
-      postData = this.getMockPostData(shortcode);
-    }
-
+    // No single post endpoint on this API — use mock
+    const postData = this.getMockPostData(shortcode);
     await cache.set('posts', shortcode, postData);
     return postData;
   }
@@ -175,29 +136,29 @@ class InstagramService {
     const cached = await cache.get('search', query);
     if (cached) return cached;
 
+    // No search endpoint on this API — try direct Instagram search
     let results = null;
-
-    // Try RapidAPI search
     try {
-      const rapid = await this.fetchViaRapidAPI('search_users/', { search_query: query });
-      if (rapid && rapid.data && rapid.data.items) {
-        results = rapid.data.items.map(u => this.normalizeSearchResult(u));
+      const resp = await axios.get('https://www.instagram.com/web/search/topsearch/', {
+        params: { context: 'blended', query, rank_token: Math.random().toString(36).slice(2) },
+        headers: {
+          'User-Agent': this.userAgent.toString(),
+          'Accept': 'application/json',
+        },
+        timeout: 10000,
+      });
+      if (resp.data && resp.data.users) {
+        results = resp.data.users.map(u => ({
+          id: u.user.pk || u.user.id,
+          username: u.user.username,
+          full_name: u.user.full_name || u.user.username,
+          profile_pic_url: u.user.profile_pic_url || '/images/default-avatar.svg',
+          is_verified: u.user.is_verified || false,
+          is_private: u.user.is_private || false,
+          followers_count: u.user.follower_count || 0,
+        }));
       }
     } catch (e) { /* fall through */ }
-
-    // Try direct Instagram search
-    if (!results) {
-      try {
-        const resp = await axios.get(`https://www.instagram.com/web/search/topsearch/`, {
-          params: { context: 'blended', query, rank_token: Math.random().toString(36).slice(2) },
-          headers: this.getHeaders(),
-          timeout: 10000,
-        });
-        if (resp.data && resp.data.users) {
-          results = resp.data.users.map(u => this.normalizeSearchResult(u.user));
-        }
-      } catch (e) { /* fall through */ }
-    }
 
     if (!results) {
       results = this.getMockSearchData(query);
@@ -205,88 +166,6 @@ class InstagramService {
 
     await cache.set('search', query, results);
     return results;
-  }
-
-  // ─── Normalizers ───
-  normalizeRapidAPIProfile(data) {
-    return {
-      id: data.id || data.pk,
-      username: data.username,
-      full_name: data.full_name || data.username,
-      biography: data.biography || data.bio || '',
-      profile_pic_url: data.profile_pic_url || data.profile_pic_url_hd || '/images/default-avatar.svg',
-      profile_pic_url_hd: data.profile_pic_url_hd || data.hd_profile_pic_url_info?.url || data.profile_pic_url || '/images/default-avatar.svg',
-      followers_count: data.follower_count || data.edge_followed_by?.count || 0,
-      following_count: data.following_count || data.edge_follow?.count || 0,
-      posts_count: data.media_count || data.edge_owner_to_timeline_media?.count || 0,
-      is_verified: data.is_verified || false,
-      is_private: data.is_private || false,
-      external_url: data.external_url || '',
-      recent_posts: (data.edge_owner_to_timeline_media?.edges || data.items || []).slice(0, 12).map((item, i) => {
-        const node = item.node || item;
-        return {
-          id: node.id || node.pk || `post_${i}`,
-          shortcode: node.shortcode || node.code || `code_${i}`,
-          display_url: node.display_url || node.image_versions2?.candidates?.[0]?.url || node.thumbnail_url || `https://picsum.photos/400/400?random=${i}`,
-          thumbnail_url: node.thumbnail_src || node.thumbnail_url || node.display_url || `https://picsum.photos/300/300?random=${i}`,
-          is_video: node.is_video || node.media_type === 2,
-          likes_count: node.edge_liked_by?.count || node.like_count || 0,
-          comments_count: node.edge_media_to_comment?.count || node.comment_count || 0,
-          caption: node.edge_media_to_caption?.edges?.[0]?.node?.text || node.caption?.text || '',
-          timestamp: node.taken_at_timestamp || node.taken_at || (Date.now() / 1000 - i * 86400),
-        };
-      }),
-    };
-  }
-
-  normalizeScrapedProfile(user) {
-    return this.normalizeRapidAPIProfile(user); // same shape mostly
-  }
-
-  normalizeRapidAPIStories(data, username) {
-    const items = Array.isArray(data) ? data : data.items || data.stories || [];
-    return {
-      user: { username, profile_pic_url: '/images/default-avatar.svg' },
-      stories: items.map((s, i) => ({
-        id: s.id || s.pk || `story_${i}`,
-        display_url: s.image_versions2?.candidates?.[0]?.url || s.display_url || `https://picsum.photos/400/600?random=${i + 100}`,
-        is_video: s.media_type === 2 || s.is_video || false,
-        video_url: s.video_versions?.[0]?.url || null,
-        timestamp: s.taken_at || (Date.now() / 1000 - i * 3600),
-        expires_at: s.expiring_at || (Date.now() / 1000 + 86400),
-      })),
-    };
-  }
-
-  normalizeRapidAPIPost(data) {
-    return {
-      id: data.id || data.pk,
-      shortcode: data.shortcode || data.code,
-      display_url: data.image_versions2?.candidates?.[0]?.url || data.display_url || '',
-      is_video: data.media_type === 2 || data.is_video || false,
-      video_url: data.video_versions?.[0]?.url || null,
-      caption: data.caption?.text || '',
-      likes_count: data.like_count || 0,
-      comments_count: data.comment_count || 0,
-      timestamp: data.taken_at || Date.now() / 1000,
-      owner: {
-        username: data.user?.username || 'unknown',
-        full_name: data.user?.full_name || '',
-        profile_pic_url: data.user?.profile_pic_url || '/images/default-avatar.svg',
-      },
-    };
-  }
-
-  normalizeSearchResult(user) {
-    return {
-      id: user.pk || user.id,
-      username: user.username,
-      full_name: user.full_name || user.username,
-      profile_pic_url: user.profile_pic_url || '/images/default-avatar.svg',
-      is_verified: user.is_verified || false,
-      is_private: user.is_private || false,
-      followers_count: user.follower_count || 0,
-    };
   }
 
   // ─── Mock Data ───
@@ -297,7 +176,7 @@ class InstagramService {
       id: String(r(999999999)),
       username,
       full_name: username.charAt(0).toUpperCase() + username.slice(1),
-      biography: `Welcome to @${username}'s profile. View stories and posts anonymously on InstaViewer.`,
+      biography: `Welcome to @${username}'s profile. View stories and posts anonymously on iPeep.`,
       profile_pic_url: `https://ui-avatars.com/api/?name=${username}&background=E1306C&color=fff&size=150`,
       profile_pic_url_hd: `https://ui-avatars.com/api/?name=${username}&background=E1306C&color=fff&size=320`,
       followers_count: r(10000000),
@@ -345,7 +224,7 @@ class InstagramService {
       display_url: `https://picsum.photos/seed/${shortcode}/600/600`,
       is_video: false,
       video_url: null,
-      caption: `Viewing post ${shortcode} anonymously on InstaViewer. #instagram`,
+      caption: `Viewing post ${shortcode} anonymously on iPeep. #instagram`,
       likes_count: Math.floor(Math.random() * 50000),
       comments_count: Math.floor(Math.random() * 2000),
       timestamp: Date.now() / 1000 - 86400,
