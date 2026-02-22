@@ -1,27 +1,35 @@
 const axios = require('axios');
+const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
 
-async function test() {
+async function tryAPI(name, host, endpoint, params) {
   try {
-    const resp = await axios.get('https://instagram-scraper-20251.p.rapidapi.com/userinfo/', {
-      params: { username_or_id: 'funkopopsnews' },
-      headers: {
-        'X-RapidAPI-Key': '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf',
-        'X-RapidAPI-Host': 'instagram-scraper-20251.p.rapidapi.com',
-      },
+    const r = await axios.get(`https://${host}${endpoint}`, {
+      params,
+      headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
       timeout: 15000,
     });
-    const d = resp.data.data;
-    console.log('username:', d.username);
-    console.log('full_name:', d.full_name);
-    console.log('followers:', d.follower_count);
-    console.log('is_private:', d.is_private);
-    console.log('media_count:', d.media_count);
-    // Check if posts are included
-    console.log('has items?', !!d.items);
-    console.log('has edge_owner?', !!d.edge_owner_to_timeline_media);
-    console.log('keys:', Object.keys(d).filter(k => k.includes('media') || k.includes('item') || k.includes('edge') || k.includes('post')));
+    console.log(`✅ ${name}: ${r.status}`, JSON.stringify(r.data).slice(0, 300));
+    return true;
   } catch (e) {
-    console.log('Error:', e.response?.status, e.response?.data || e.message);
+    console.log(`❌ ${name}: ${e.response?.status || 'TIMEOUT'}`, JSON.stringify(e.response?.data || e.message).slice(0, 200));
+    return false;
   }
 }
-test();
+
+async function main() {
+  // 1. Instagram Scraper (junioroangel)
+  await tryAPI('instagram-scraper', 'instagram-scraper.p.rapidapi.com', '/user_info', { username: 'instagram' });
+  
+  // 2. Instagram API Fast & Reliable
+  await tryAPI('fast-reliable', 'instagram-api-fast-reliable-data-scraper.p.rapidapi.com', '/user_info', { username: 'instagram' });
+  
+  // 3. Instagram Scraper Stable API
+  await tryAPI('stable-api', 'instagram-scraper-stable-api.p.rapidapi.com', '/user_info', { username: 'instagram' });
+  
+  // 4. Free Instagram Scraper
+  await tryAPI('free-scraper', 'free-instagram-scraper.p.rapidapi.com', '/user_info', { username: 'instagram' });
+
+  // 5. Instagram Scrapper Posts & Reels
+  await tryAPI('posts-reels', 'instagram-scrapper-posts-reels-stories-downloader.p.rapidapi.com', '/user_info', { username: 'instagram' });
+}
+main();
