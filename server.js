@@ -6,6 +6,7 @@ const cors = require('cors');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 require('dotenv').config();
 
+const expressLayouts = require('express-ejs-layouts');
 const config = require('./config');
 const cache = require('./services/cache');
 
@@ -68,6 +69,8 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: '7d' }));
 // View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(expressLayouts);
+app.set('layout', 'layout');
 
 // Template locals
 const seo = require('./utils/seo');
