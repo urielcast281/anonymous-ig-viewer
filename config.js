@@ -45,7 +45,7 @@ module.exports = {
   GA_TRACKING_ID: process.env.GA_TRACKING_ID || '',
 
   SEO: {
-    SITE_NAME: process.env.SITE_NAME || 'InstaViewer - Anonymous Instagram Story & Profile Viewer',
+    SITE_NAME: process.env.SITE_NAME || 'iPeep - Anonymous Instagram Story & Profile Viewer',
     SITE_DESCRIPTION: 'View Instagram stories, profiles, and posts anonymously. No login required. Download Instagram content easily and safely.',
     SITE_URL: process.env.SITE_URL || 'https://instaviewer.net',
     DEFAULT_IMAGE: '/images/og-default.jpg',
