@@ -87,11 +87,19 @@ class InstagramService {
 
     let profileData = null;
 
-    // Method 1: RapidAPI
+    // Method 1: RapidAPI (profile info + posts in parallel)
     try {
-      const rapid = await this.fetchViaRapidAPI('userinfo/', { username_or_id: username });
-      if (rapid && rapid.data) {
-        profileData = this.normalizeRapidAPIProfile(rapid.data);
+      const [rapidProfile, rapidPosts] = await Promise.all([
+        this.fetchViaRapidAPI('userinfo/', { username_or_id: username }),
+        this.fetchViaRapidAPI('userposts/', { username_or_id: username }),
+      ]);
+      if (rapidProfile && rapidProfile.data) {
+        // Merge posts into profile data so normalizer can find them
+        const mergedData = { ...rapidProfile.data };
+        if (rapidPosts && rapidPosts.data && rapidPosts.data.items) {
+          mergedData.items = rapidPosts.data.items;
+        }
+        profileData = this.normalizeRapidAPIProfile(mergedData);
       }
     } catch (e) {
       console.log(`RapidAPI profile fetch failed: ${e.message}`);
