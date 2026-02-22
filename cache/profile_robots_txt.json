@@ -1,0 +1,153 @@
+{
+  "timestamp": 1771726106611,
+  "type": "profile",
+  "identifier": "robots.txt",
+  "data": {
+    "id": "9936260",
+    "username": "robots.txt",
+    "full_name": "Robots.txt",
+    "biography": "Welcome to @robots.txt's profile. View stories and posts anonymously on InstaViewer.",
+    "profile_pic_url": "https://ui-avatars.com/api/?name=robots.txt&background=E1306C&color=fff&size=150",
+    "profile_pic_url_hd": "https://ui-avatars.com/api/?name=robots.txt&background=E1306C&color=fff&size=320",
+    "followers_count": 9936260,
+    "following_count": 1260,
+    "posts_count": 260,
+    "is_verified": false,
+    "is_private": false,
+    "external_url": "",
+    "recent_posts": [
+      {
+        "id": "robots.txt_0",
+        "shortcode": "robot000000",
+        "display_url": "https://picsum.photos/seed/robots.txt0/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt0/300/300",
+        "is_video": true,
+        "likes_count": 36260,
+        "comments_count": 260,
+        "caption": "Post 1 by @robots.txt #instagram #explore",
+        "timestamp": 1771726106.611
+      },
+      {
+        "id": "robots.txt_1",
+        "shortcode": "robot000001",
+        "display_url": "https://picsum.photos/seed/robots.txt1/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt1/300/300",
+        "is_video": false,
+        "likes_count": 36360,
+        "comments_count": 270,
+        "caption": "Post 2 by @robots.txt #instagram #explore",
+        "timestamp": 1771639706.611
+      },
+      {
+        "id": "robots.txt_2",
+        "shortcode": "robot000002",
+        "display_url": "https://picsum.photos/seed/robots.txt2/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt2/300/300",
+        "is_video": false,
+        "likes_count": 36460,
+        "comments_count": 280,
+        "caption": "Post 3 by @robots.txt #instagram #explore",
+        "timestamp": 1771553306.611
+      },
+      {
+        "id": "robots.txt_3",
+        "shortcode": "robot000003",
+        "display_url": "https://picsum.photos/seed/robots.txt3/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt3/300/300",
+        "is_video": false,
+        "likes_count": 36560,
+        "comments_count": 290,
+        "caption": "Post 4 by @robots.txt #instagram #explore",
+        "timestamp": 1771466906.611
+      },
+      {
+        "id": "robots.txt_4",
+        "shortcode": "robot000004",
+        "display_url": "https://picsum.photos/seed/robots.txt4/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt4/300/300",
+        "is_video": false,
+        "likes_count": 36660,
+        "comments_count": 300,
+        "caption": "Post 5 by @robots.txt #instagram #explore",
+        "timestamp": 1771380506.611
+      },
+      {
+        "id": "robots.txt_5",
+        "shortcode": "robot000005",
+        "display_url": "https://picsum.photos/seed/robots.txt5/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt5/300/300",
+        "is_video": true,
+        "likes_count": 36760,
+        "comments_count": 310,
+        "caption": "Post 6 by @robots.txt #instagram #explore",
+        "timestamp": 1771294106.611
+      },
+      {
+        "id": "robots.txt_6",
+        "shortcode": "robot000006",
+        "display_url": "https://picsum.photos/seed/robots.txt6/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt6/300/300",
+        "is_video": false,
+        "likes_count": 36860,
+        "comments_count": 320,
+        "caption": "Post 7 by @robots.txt #instagram #explore",
+        "timestamp": 1771207706.611
+      },
+      {
+        "id": "robots.txt_7",
+        "shortcode": "robot000007",
+        "display_url": "https://picsum.photos/seed/robots.txt7/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt7/300/300",
+        "is_video": false,
+        "likes_count": 36960,
+        "comments_count": 330,
+        "caption": "Post 8 by @robots.txt #instagram #explore",
+        "timestamp": 1771121306.611
+      },
+      {
+        "id": "robots.txt_8",
+        "shortcode": "robot000008",
+        "display_url": "https://picsum.photos/seed/robots.txt8/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt8/300/300",
+        "is_video": false,
+        "likes_count": 37060,
+        "comments_count": 340,
+        "caption": "Post 9 by @robots.txt #instagram #explore",
+        "timestamp": 1771034906.611
+      },
+      {
+        "id": "robots.txt_9",
+        "shortcode": "robot000009",
+        "display_url": "https://picsum.photos/seed/robots.txt9/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt9/300/300",
+        "is_video": false,
+        "likes_count": 37160,
+        "comments_count": 350,
+        "caption": "Post 10 by @robots.txt #instagram #explore",
+        "timestamp": 1770948506.611
+      },
+      {
+        "id": "robots.txt_10",
+        "shortcode": "robot000010",
+        "display_url": "https://picsum.photos/seed/robots.txt10/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt10/300/300",
+        "is_video": true,
+        "likes_count": 37260,
+        "comments_count": 360,
+        "caption": "Post 11 by @robots.txt #instagram #explore",
+        "timestamp": 1770862106.611
+      },
+      {
+        "id": "robots.txt_11",
+        "shortcode": "robot000011",
+        "display_url": "https://picsum.photos/seed/robots.txt11/600/600",
+        "thumbnail_url": "https://picsum.photos/seed/robots.txt11/300/300",
+        "is_video": false,
+        "likes_count": 37360,
+        "comments_count": 370,
+        "caption": "Post 12 by @robots.txt #instagram #explore",
+        "timestamp": 1770775706.611
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "timestamp": 1771726106455,
+  "type": "stories",
+  "identifier": "sitemap.xml",
+  "data": {
+    "user": {
+      "username": "sitemap.xml",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=sitemap.xml&background=E1306C&color=fff&size=150"
+    },
+    "stories": [
+      {
+        "id": "story_sitemap.xml_0",
+        "display_url": "https://picsum.photos/seed/sitemap.xmlstory0/400/700",
+        "is_video": true,
+        "video_url": null,
+        "timestamp": 1771726106.455,
+        "expires_at": 1771812506.455
+      },
+      {
+        "id": "story_sitemap.xml_1",
+        "display_url": "https://picsum.photos/seed/sitemap.xmlstory1/400/700",
+        "is_video": false,
+        "video_url": null,
+        "timestamp": 1771722506.455,
+        "expires_at": 1771808906.455
+      }
+    ]
+  }
+}

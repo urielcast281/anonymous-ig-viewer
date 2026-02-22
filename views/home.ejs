@@ -1,0 +1,282 @@
+<div class="home-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Anonymous Instagram Viewer</h1>
+                <p class="hero-subtitle">View Instagram stories, profiles, and posts without logging in. Completely anonymous and free.</p>
+                
+                <!-- Main Search -->
+                <div class="hero-search">
+                    <form action="/search" method="GET" class="search-form-large">
+                        <div class="search-input-group">
+                            <span class="search-prefix">@</span>
+                            <input type="text" 
+                                   name="q" 
+                                   class="search-input-large" 
+                                   placeholder="Enter Instagram username" 
+                                   value="<%= searchQuery || '' %>"
+                                   required>
+                            <button type="submit" class="search-btn-large">
+                                <span class="search-icon">🔍</span>
+                                <span class="search-text">View Profile</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Feature Pills -->
+                <div class="feature-pills">
+                    <span class="pill">📱 No Login Required</span>
+                    <span class="pill">👁️ Anonymous Viewing</span>
+                    <span class="pill">📥 Download Stories</span>
+                    <span class="pill">🚀 Fast & Free</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results (if any) -->
+    <% if (typeof searchResults !== 'undefined' && searchResults) { %>
+    <div class="search-results-section">
+        <div class="container">
+            <div class="results-header">
+                <h2>Search Results for "<%= searchQuery %>"</h2>
+                <p class="results-count"><%= searchResults.length %> users found</p>
+            </div>
+            
+            <!-- Native Ad in Search Results -->
+            <% if (config.ADS.ENABLE_ADS && searchResults.length > 3) { %>
+            <div class="ad-slot ad-native-search" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_NATIVE %>">
+                <div class="ad-label">Advertisement</div>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-format="fluid"
+                     data-ad-layout-key="-6t+ed+2i-1n-4w"
+                     data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                     data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_NATIVE %>"></ins>
+            </div>
+            <% } %>
+            
+            <div class="search-results-grid">
+                <% searchResults.forEach((result, index) => { %>
+                <div class="user-card">
+                    <a href="/profile/<%= result.username %>" class="user-link">
+                        <div class="user-avatar">
+                            <img src="<%= result.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                 alt="<%= result.username %>" 
+                                 loading="lazy">
+                            <% if (result.is_verified) { %>
+                            <span class="verified-badge">✓</span>
+                            <% } %>
+                        </div>
+                        <div class="user-info">
+                            <h3 class="user-username">@<%= result.username %></h3>
+                            <p class="user-fullname"><%= result.full_name %></p>
+                            <div class="user-stats">
+                                <% if (result.followers_count) { %>
+                                <span class="stat">
+                                    <%= seo.formatCount(result.followers_count) %> followers
+                                </span>
+                                <% } %>
+                                <% if (result.is_private) { %>
+                                <span class="privacy-badge">🔒 Private</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="user-actions">
+                        <a href="/profile/<%= result.username %>" class="btn btn-primary">View Profile</a>
+                        <a href="/stories/<%= result.username %>" class="btn btn-secondary">Stories</a>
+                    </div>
+                </div>
+                
+                <!-- In-feed Ad every 4 results -->
+                <% if (config.ADS.ENABLE_ADS && (index + 1) % 4 === 0 && index < searchResults.length - 1) { %>
+                <div class="ad-slot ad-infeed" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
+                    <div class="ad-label">Advertisement</div>
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-format="fluid"
+                         data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                         data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
+                </div>
+                <% } %>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    <% } else if (typeof searchError !== 'undefined' && searchError) { %>
+    <!-- Search Error -->
+    <div class="search-error-section">
+        <div class="container">
+            <div class="error-message">
+                <h2>Search Temporarily Unavailable</h2>
+                <p><%= searchError %></p>
+                <a href="/" class="btn btn-primary">Try Again</a>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Trending Profiles -->
+    <% if (trendingProfiles && trendingProfiles.length > 0) { %>
+    <div class="trending-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">🔥 Trending Profiles</h2>
+                <p class="section-subtitle">Most popular Instagram profiles to explore</p>
+            </div>
+            
+            <div class="trending-grid">
+                <% trendingProfiles.forEach((item, index) => { %>
+                <div class="profile-card">
+                    <a href="/profile/<%= item.username %>" class="profile-link">
+                        <div class="profile-header">
+                            <img src="<%= item.profile?.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                 alt="<%= item.username %>" 
+                                 class="profile-avatar"
+                                 loading="lazy">
+                            <% if (item.profile?.is_verified) { %>
+                            <span class="verified-badge">✓</span>
+                            <% } %>
+                        </div>
+                        
+                        <div class="profile-info">
+                            <h3 class="profile-username">@<%= item.username %></h3>
+                            <% if (item.profile?.full_name) { %>
+                            <p class="profile-fullname"><%= item.profile.full_name %></p>
+                            <% } %>
+                            
+                            <% if (item.profile) { %>
+                            <div class="profile-stats">
+                                <div class="stat">
+                                    <span class="stat-number"><%= seo.formatCount(item.profile.followers_count) %></span>
+                                    <span class="stat-label">Followers</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number"><%= seo.formatCount(item.profile.posts_count) %></span>
+                                    <span class="stat-label">Posts</span>
+                                </div>
+                            </div>
+                            <% } %>
+                        </div>
+                    </a>
+                    
+                    <div class="profile-actions">
+                        <a href="/profile/<%= item.username %>" class="btn btn-primary">View Profile</a>
+                        <a href="/stories/<%= item.username %>" class="btn btn-outline">Stories</a>
+                    </div>
+                </div>
+                
+                <!-- Ad after every 3 profiles -->
+                <% if (config.ADS.ENABLE_ADS && (index + 1) % 3 === 0 && index < trendingProfiles.length - 1) { %>
+                <div class="ad-slot ad-trending" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
+                    <div class="ad-label">Advertisement</div>
+                    <ins class="adsbygoogle"
+                         style="display:block;width:300px;height:250px"
+                         data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                         data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
+                </div>
+                <% } %>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Features Section -->
+    <div class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose InstaViewer?</h2>
+                <p class="section-subtitle">The best way to view Instagram content anonymously</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <h3>100% Anonymous</h3>
+                    <p>View stories and profiles without revealing your identity. No traces left behind.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🚫</div>
+                    <h3>No Login Required</h3>
+                    <p>Access Instagram content without creating an account or providing personal information.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📥</div>
+                    <h3>Download Content</h3>
+                    <p>Save stories, posts, and profile pictures in high quality directly to your device.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized for speed with intelligent caching. Get results in seconds.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Perfect experience on all devices - phone, tablet, or desktop computer.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Privacy Protected</h3>
+                    <p>We don't store your data or track your viewing history. Your privacy is guaranteed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Get started in 3 simple steps</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Enter Username</h3>
+                    <p>Type the Instagram username in the search box above</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Browse Content</h3>
+                    <p>View their profile, stories, and posts anonymously</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Download (Optional)</h3>
+                    <p>Save any content you like directly to your device</p>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <a href="/about/how-it-works" class="btn btn-primary">Learn More</a>
+                <a href="/about" class="btn btn-outline">FAQ</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Initialize ads for this page -->
+<% if (config.ADS.ENABLE_ADS) { %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize search results ads
+    setTimeout(function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    }, 1000);
+});
+</script>
+<% } %>

@@ -1,0 +1,461 @@
+<div class="post-container">
+    <div class="container">
+        <div class="post-layout">
+            <!-- Main Post Content -->
+            <div class="post-main">
+                <!-- Post Header -->
+                <div class="post-header">
+                    <div class="post-navigation">
+                        <% if (authorProfile) { %>
+                        <a href="/profile/<%= post.owner.username %>" class="back-link">
+                            ← Back to @<%= post.owner.username %>
+                        </a>
+                        <% } else { %>
+                        <a href="/" class="back-link">
+                            ← Home
+                        </a>
+                        <% } %>
+                    </div>
+                    
+                    <div class="post-meta">
+                        <div class="post-author">
+                            <a href="/profile/<%= post.owner.username %>" class="author-link">
+                                <img src="<%= post.owner.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                     alt="<%= post.owner.username %>" 
+                                     class="author-avatar">
+                                <div class="author-info">
+                                    <h2 class="author-username">@<%= post.owner.username %></h2>
+                                    <% if (post.owner.full_name && post.owner.full_name !== post.owner.username) { %>
+                                    <p class="author-fullname"><%= post.owner.full_name %></p>
+                                    <% } %>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <div class="post-date">
+                            <%= new Date(post.timestamp * 1000).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            }) %>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post Media -->
+                <div class="post-media-container">
+                    <% if (post.is_video && post.video_url) { %>
+                    <div class="post-video-wrapper">
+                        <video class="post-video" 
+                               controls 
+                               poster="<%= post.display_url %>"
+                               preload="metadata">
+                            <source src="<%= post.video_url %>" type="video/mp4">
+                            <p>Your browser does not support the video element.</p>
+                        </video>
+                        <div class="media-type-indicator video">
+                            <span class="icon">▶️</span>
+                            <span class="label">Video</span>
+                        </div>
+                    </div>
+                    <% } else { %>
+                    <div class="post-image-wrapper">
+                        <img src="<%= post.display_url %>" 
+                             alt="Post by <%= post.owner.username %>" 
+                             class="post-image">
+                        <div class="media-type-indicator photo">
+                            <span class="icon">📷</span>
+                            <span class="label">Photo</span>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+                
+                <!-- Post Stats -->
+                <div class="post-stats">
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="stat-icon">❤️</span>
+                            <span class="stat-number"><%= seo.formatCount(post.likes_count) %></span>
+                            <span class="stat-label">Likes</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-icon">💬</span>
+                            <span class="stat-number"><%= seo.formatCount(post.comments_count) %></span>
+                            <span class="stat-label">Comments</span>
+                        </div>
+                        
+                        <div class="stat-item">
+                            <span class="stat-icon">📤</span>
+                            <span class="stat-number">Share</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Post Caption -->
+                <% if (post.caption) { %>
+                <div class="post-caption">
+                    <div class="caption-content">
+                        <span class="caption-username">@<%= post.owner.username %></span>
+                        <span class="caption-text"><%= post.caption %></span>
+                    </div>
+                </div>
+                <% } %>
+                
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <button onclick="downloadPost('<%= post.shortcode %>', '<%= post.is_video ? post.video_url : post.display_url %>', '<%= post.owner.username %>', <%= post.is_video %>)" 
+                            class="action-btn download-btn">
+                        <span class="btn-icon">📥</span>
+                        <span class="btn-text">Download</span>
+                    </button>
+                    
+                    <button onclick="sharePost('<%= post.shortcode %>')" class="action-btn share-btn">
+                        <span class="btn-icon">📤</span>
+                        <span class="btn-text">Share</span>
+                    </button>
+                    
+                    <a href="https://instagram.com/p/<%= post.shortcode %>/" 
+                       target="_blank" 
+                       rel="noopener" 
+                       class="action-btn instagram-btn">
+                        <span class="btn-icon">📱</span>
+                        <span class="btn-text">View on Instagram</span>
+                    </a>
+                    
+                    <button onclick="copyPostLink('<%= post.shortcode %>')" class="action-btn copy-btn">
+                        <span class="btn-icon">🔗</span>
+                        <span class="btn-text">Copy Link</span>
+                    </button>
+                </div>
+                
+                <!-- Post Information -->
+                <div class="post-information">
+                    <h3 class="info-title">Post Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Post ID:</span>
+                            <span class="info-value"><%= post.id %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Shortcode:</span>
+                            <span class="info-value"><%= post.shortcode %></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Type:</span>
+                            <span class="info-value">
+                                <%= post.is_video ? 'Video Post' : 'Photo Post' %>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Posted:</span>
+                            <span class="info-value">
+                                <%= new Date(post.timestamp * 1000).toLocaleString() %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Related Posts -->
+                <% if (relatedPosts && relatedPosts.length > 0) { %>
+                <div class="related-posts">
+                    <h3 class="related-title">More from @<%= post.owner.username %></h3>
+                    <div class="related-posts-grid">
+                        <% relatedPosts.forEach((relatedPost, index) => { %>
+                        <div class="related-post">
+                            <a href="/post/<%= relatedPost.shortcode %>" class="related-link">
+                                <img src="<%= relatedPost.thumbnail_url || relatedPost.display_url %>" 
+                                     alt="Post by <%= post.owner.username %>" 
+                                     class="related-image">
+                                
+                                <% if (relatedPost.is_video) { %>
+                                <div class="related-video-indicator">▶️</div>
+                                <% } %>
+                                
+                                <div class="related-overlay">
+                                    <div class="related-stats">
+                                        <span class="related-stat">
+                                            ❤️ <%= seo.formatCount(relatedPost.likes_count) %>
+                                        </span>
+                                        <span class="related-stat">
+                                            💬 <%= seo.formatCount(relatedPost.comments_count) %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <!-- Ad after 3 related posts -->
+                        <% if (config.ADS.ENABLE_ADS && index === 2 && relatedPosts.length > 3) { %>
+                        <div class="ad-slot ad-related" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
+                            <div class="ad-label">Advertisement</div>
+                            <ins class="adsbygoogle"
+                                 style="display:block;width:100%;height:200px"
+                                 data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                                 data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
+                        </div>
+                        <% } %>
+                        <% }) %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="post-sidebar">
+                <!-- Sidebar Ad -->
+                <% if (config.ADS.ENABLE_ADS) { %>
+                <div class="ad-slot ad-sidebar" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>">
+                    <div class="ad-label">Advertisement</div>
+                    <ins class="adsbygoogle"
+                         style="display:inline-block;width:300px;height:250px"
+                         data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                         data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>"></ins>
+                </div>
+                <% } %>
+                
+                <!-- Author Info -->
+                <% if (authorProfile) { %>
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">About This User</h4>
+                    <div class="author-profile">
+                        <a href="/profile/<%= post.owner.username %>" class="author-profile-link">
+                            <img src="<%= authorProfile.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                 alt="<%= post.owner.username %>" 
+                                 class="author-profile-avatar">
+                            <div class="author-profile-info">
+                                <div class="author-profile-username">@<%= post.owner.username %></div>
+                                <div class="author-profile-fullname"><%= authorProfile.full_name || '' %></div>
+                                <div class="author-profile-stats">
+                                    <span><%= seo.formatCount(authorProfile.followers_count) %> followers</span>
+                                    <span><%= seo.formatCount(authorProfile.posts_count) %> posts</span>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="author-actions">
+                            <a href="/profile/<%= post.owner.username %>" class="btn btn-primary">
+                                View Profile
+                            </a>
+                            <a href="/stories/<%= post.owner.username %>" class="btn btn-outline">
+                                View Stories
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+                
+                <!-- Trending Profiles -->
+                <% if (trendingProfiles && trendingProfiles.length > 0) { %>
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Trending Profiles</h4>
+                    <div class="trending-list">
+                        <% trendingProfiles.forEach(item => { %>
+                        <div class="trending-item">
+                            <a href="/profile/<%= item.username %>" class="trending-link">
+                                <img src="<%= item.profile?.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                     alt="<%= item.username %>" 
+                                     class="trending-avatar">
+                                <div class="trending-info">
+                                    <div class="trending-username">@<%= item.username %></div>
+                                    <% if (item.profile?.followers_count) { %>
+                                    <div class="trending-followers">
+                                        <%= seo.formatCount(item.profile.followers_count) %> followers
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </a>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <% } %>
+                
+                <!-- Quick Tools -->
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Quick Tools</h4>
+                    <div class="quick-tools">
+                        <div class="tool-item">
+                            <label for="postUrl">Instagram Post URL:</label>
+                            <input type="text" 
+                                   id="postUrl" 
+                                   value="https://instagram.com/p/<%= post.shortcode %>/" 
+                                   readonly 
+                                   class="tool-input">
+                            <button onclick="copyToClipboard('postUrl')" class="tool-btn">Copy</button>
+                        </div>
+                        
+                        <div class="tool-item">
+                            <label for="viewerUrl">Viewer URL:</label>
+                            <input type="text" 
+                                   id="viewerUrl" 
+                                   value="<%= config.SEO.SITE_URL %>/post/<%= post.shortcode %>" 
+                                   readonly 
+                                   class="tool-input">
+                            <button onclick="copyToClipboard('viewerUrl')" class="tool-btn">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Post Actions Script -->
+<script>
+function downloadPost(shortcode, mediaUrl, username, isVideo) {
+    const extension = isVideo ? 'mp4' : 'jpg';
+    const filename = `${username}_${shortcode}.${extension}`;
+    
+    const link = document.createElement('a');
+    link.href = mediaUrl;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Show success message
+    showToast('Download started!', 'success');
+}
+
+function sharePost(shortcode) {
+    const url = window.location.href;
+    const text = `Check out this Instagram post on InstaViewer - Anonymous Instagram Viewer`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: text,
+            url: url
+        });
+    } else {
+        copyPostLink(shortcode);
+    }
+}
+
+function copyPostLink(shortcode) {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        showToast('Post link copied to clipboard!', 'success');
+    }).catch(() => {
+        showToast('Failed to copy link', 'error');
+    });
+}
+
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    element.setSelectionRange(0, 99999); // For mobile devices
+    
+    navigator.clipboard.writeText(element.value).then(() => {
+        showToast('Copied to clipboard!', 'success');
+    }).catch(() => {
+        document.execCommand('copy');
+        showToast('Copied to clipboard!', 'success');
+    });
+}
+
+function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    // Style the toast
+    Object.assign(toast.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 24px',
+        backgroundColor: type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3',
+        color: 'white',
+        borderRadius: '4px',
+        zIndex: '10000',
+        fontSize: '14px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        transition: 'all 0.3s ease'
+    });
+    
+    document.body.appendChild(toast);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+// Image zoom functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const postImage = document.querySelector('.post-image');
+    if (postImage) {
+        postImage.addEventListener('click', function() {
+            // Create fullscreen overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'image-overlay';
+            overlay.innerHTML = `
+                <img src="${this.src}" alt="Full size image">
+                <button class="close-overlay">✕</button>
+            `;
+            
+            // Style the overlay
+            Object.assign(overlay.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0,0,0,0.9)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '10000',
+                cursor: 'pointer'
+            });
+            
+            const overlayImage = overlay.querySelector('img');
+            Object.assign(overlayImage.style, {
+                maxWidth: '90%',
+                maxHeight: '90%',
+                objectFit: 'contain'
+            });
+            
+            const closeBtn = overlay.querySelector('.close-overlay');
+            Object.assign(closeBtn.style, {
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: 'white',
+                fontSize: '24px',
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                cursor: 'pointer'
+            });
+            
+            // Close overlay on click
+            overlay.addEventListener('click', () => {
+                document.body.removeChild(overlay);
+            });
+            
+            document.body.appendChild(overlay);
+        });
+    }
+});
+</script>
+
+<!-- Initialize ads -->
+<% if (config.ADS.ENABLE_ADS) { %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    }, 1000);
+});
+</script>
+<% } %>

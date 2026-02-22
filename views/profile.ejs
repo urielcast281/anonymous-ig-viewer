@@ -1,0 +1,331 @@
+<div class="profile-container">
+    <div class="container">
+        <div class="profile-layout">
+            <!-- Main Profile Content -->
+            <div class="profile-main">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-wrapper">
+                            <img src="<%= profile.profile_pic_url_hd || profile.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                 alt="<%= profile.username %>" 
+                                 class="profile-avatar-large">
+                            <% if (profile.is_verified) { %>
+                            <span class="verified-badge-large">✓</span>
+                            <% } %>
+                        </div>
+                        
+                        <!-- Stories Preview -->
+                        <% if (stories && stories.stories && stories.stories.length > 0) { %>
+                        <div class="stories-ring active">
+                            <a href="/stories/<%= username %>" class="stories-link">
+                                <span class="stories-count"><%= stories.stories.length %></span>
+                                <span class="stories-label">Stories</span>
+                            </a>
+                        </div>
+                        <% } else { %>
+                        <div class="stories-ring inactive">
+                            <span class="stories-count">0</span>
+                            <span class="stories-label">Stories</span>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="profile-info-section">
+                        <div class="profile-title">
+                            <h1 class="profile-username">@<%= profile.username %></h1>
+                            <% if (profile.full_name && profile.full_name !== profile.username) { %>
+                            <h2 class="profile-fullname"><%= profile.full_name %></h2>
+                            <% } %>
+                        </div>
+                        
+                        <!-- Profile Stats -->
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-number"><%= seo.formatCount(profile.posts_count) %></span>
+                                <span class="stat-label">Posts</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number"><%= seo.formatCount(profile.followers_count) %></span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-number"><%= seo.formatCount(profile.following_count) %></span>
+                                <span class="stat-label">Following</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Biography -->
+                        <% if (profile.biography) { %>
+                        <div class="profile-bio">
+                            <p><%= profile.biography %></p>
+                        </div>
+                        <% } %>
+                        
+                        <!-- External URL -->
+                        <% if (profile.external_url) { %>
+                        <div class="profile-website">
+                            <a href="<%= profile.external_url %>" target="_blank" rel="noopener" class="website-link">
+                                🔗 <%= profile.external_url.replace(/^https?:\/\//, '') %>
+                            </a>
+                        </div>
+                        <% } %>
+                        
+                        <!-- Action Buttons -->
+                        <div class="profile-actions">
+                            <% if (stories && stories.stories && stories.stories.length > 0) { %>
+                            <a href="/stories/<%= username %>" class="btn btn-primary">
+                                📸 View Stories (<%= stories.stories.length %>)
+                            </a>
+                            <% } else { %>
+                            <button class="btn btn-disabled" disabled>
+                                📸 No Active Stories
+                            </button>
+                            <% } %>
+                            
+                            <a href="https://instagram.com/<%= username %>/" target="_blank" rel="noopener" class="btn btn-outline">
+                                📱 View on Instagram
+                            </a>
+                            
+                            <% if (profile.is_private) { %>
+                            <div class="privacy-notice">
+                                🔒 This account is private
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Posts Section -->
+                <% if (profile.recent_posts && profile.recent_posts.length > 0) { %>
+                <div class="posts-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Recent Posts</h3>
+                        <p class="section-subtitle"><%= profile.posts_count %> total posts</p>
+                    </div>
+                    
+                    <div class="posts-grid">
+                        <% profile.recent_posts.forEach((post, index) => { %>
+                        <div class="post-item">
+                            <a href="/post/<%= post.shortcode %>" class="post-link">
+                                <div class="post-media">
+                                    <img src="<%= post.thumbnail_url || post.display_url %>" 
+                                         alt="Post by <%= username %>" 
+                                         loading="lazy">
+                                    
+                                    <!-- Post Type Indicator -->
+                                    <% if (post.is_video) { %>
+                                    <div class="post-type-badge video">
+                                        <span class="icon">▶️</span>
+                                    </div>
+                                    <% } %>
+                                    
+                                    <!-- Post Overlay -->
+                                    <div class="post-overlay">
+                                        <div class="post-stats">
+                                            <span class="stat">
+                                                ❤️ <%= seo.formatCount(post.likes_count) %>
+                                            </span>
+                                            <span class="stat">
+                                                💬 <%= seo.formatCount(post.comments_count) %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Post Caption Preview -->
+                                <% if (post.caption) { %>
+                                <div class="post-caption-preview">
+                                    <%= post.caption.length > 80 ? post.caption.substring(0, 80) + '...' : post.caption %>
+                                </div>
+                                <% } %>
+                            </a>
+                        </div>
+                        
+                        <!-- In-feed Ad every 4 posts -->
+                        <% if (config.ADS.ENABLE_ADS && (index + 1) % 4 === 0 && index < profile.recent_posts.length - 1) { %>
+                        <div class="ad-slot ad-posts-infeed" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
+                            <div class="ad-label">Advertisement</div>
+                            <ins class="adsbygoogle"
+                                 style="display:block;width:100%;height:250px"
+                                 data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                                 data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
+                        </div>
+                        <% } %>
+                        <% }) %>
+                    </div>
+                    
+                    <!-- Load More Posts -->
+                    <% if (profile.posts_count > profile.recent_posts.length) { %>
+                    <div class="load-more-section">
+                        <p class="load-more-info">
+                            Showing <%= profile.recent_posts.length %> of <%= profile.posts_count %> posts
+                        </p>
+                        <button class="btn btn-outline" onclick="loadMorePosts('<%= username %>')">
+                            Load More Posts
+                        </button>
+                    </div>
+                    <% } %>
+                </div>
+                <% } else if (profile.posts_count === 0) { %>
+                <div class="no-posts-section">
+                    <div class="empty-state">
+                        <div class="empty-icon">📷</div>
+                        <h3>No Posts Yet</h3>
+                        <p>@<%= username %> hasn't shared any posts yet.</p>
+                    </div>
+                </div>
+                <% } else { %>
+                <div class="posts-unavailable-section">
+                    <div class="empty-state">
+                        <div class="empty-icon">🔒</div>
+                        <h3>Posts Unavailable</h3>
+                        <p>Posts for this account are currently unavailable. This may be due to privacy settings or temporary restrictions.</p>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <!-- Sidebar Ad -->
+                <% if (config.ADS.ENABLE_ADS) { %>
+                <div class="ad-slot ad-sidebar" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>">
+                    <div class="ad-label">Advertisement</div>
+                    <ins class="adsbygoogle"
+                         style="display:inline-block;width:300px;height:250px"
+                         data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                         data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>"></ins>
+                </div>
+                <% } %>
+                
+                <!-- Profile Quick Actions -->
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Quick Actions</h4>
+                    <div class="quick-actions">
+                        <a href="/stories/<%= username %>" class="action-btn">
+                            📸 View Stories
+                        </a>
+                        <button onclick="downloadProfilePicture('<%= profile.profile_pic_url_hd || profile.profile_pic_url %>', '<%= username %>')" class="action-btn">
+                            📥 Download Profile Picture
+                        </button>
+                        <button onclick="shareProfile('<%= username %>')" class="action-btn">
+                            📤 Share Profile
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Related Profiles -->
+                <% if (relatedProfiles && relatedProfiles.length > 0) { %>
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Trending Profiles</h4>
+                    <div class="related-profiles">
+                        <% relatedProfiles.forEach(item => { %>
+                        <div class="related-profile">
+                            <a href="/profile/<%= item.username %>" class="related-link">
+                                <img src="<%= item.profile?.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                                     alt="<%= item.username %>" 
+                                     class="related-avatar">
+                                <div class="related-info">
+                                    <div class="related-username">@<%= item.username %></div>
+                                    <% if (item.profile?.full_name) { %>
+                                    <div class="related-fullname"><%= item.profile.full_name %></div>
+                                    <% } %>
+                                    <% if (item.profile?.followers_count) { %>
+                                    <div class="related-followers">
+                                        <%= seo.formatCount(item.profile.followers_count) %> followers
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </a>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+                <% } %>
+                
+                <!-- Profile Information -->
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">Profile Information</h4>
+                    <div class="profile-metadata">
+                        <div class="metadata-item">
+                            <span class="metadata-label">Username:</span>
+                            <span class="metadata-value">@<%= profile.username %></span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Verification:</span>
+                            <span class="metadata-value">
+                                <% if (profile.is_verified) { %>
+                                ✅ Verified
+                                <% } else { %>
+                                ❌ Not Verified
+                                <% } %>
+                            </span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Privacy:</span>
+                            <span class="metadata-value">
+                                <% if (profile.is_private) { %>
+                                🔒 Private Account
+                                <% } else { %>
+                                🌍 Public Account
+                                <% } %>
+                            </span>
+                        </div>
+                        <div class="metadata-item">
+                            <span class="metadata-label">Profile ID:</span>
+                            <span class="metadata-value"><%= profile.id %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Actions Script -->
+<script>
+function downloadProfilePicture(url, username) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${username}_profile_picture.jpg`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function shareProfile(username) {
+    const url = window.location.href;
+    const text = `Check out @${username} on InstaViewer - Anonymous Instagram Profile Viewer`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: text,
+            url: url
+        });
+    } else {
+        // Fallback to copy URL
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Profile URL copied to clipboard!');
+        });
+    }
+}
+
+function loadMorePosts(username) {
+    // This would typically make an AJAX request to load more posts
+    // For now, redirect to a posts page
+    window.location.href = `/profile/${username}/posts`;
+}
+</script>
+
+<!-- Initialize ads -->
+<% if (config.ADS.ENABLE_ADS) { %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    }, 1000);
+});
+</script>
+<% } %>

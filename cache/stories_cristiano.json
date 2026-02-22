@@ -1,0 +1,37 @@
+{
+  "timestamp": 1771726099531,
+  "type": "stories",
+  "identifier": "cristiano",
+  "data": {
+    "user": {
+      "username": "cristiano",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano&background=E1306C&color=fff&size=150"
+    },
+    "stories": [
+      {
+        "id": "story_cristiano_0",
+        "display_url": "https://picsum.photos/seed/cristianostory0/400/700",
+        "is_video": true,
+        "video_url": null,
+        "timestamp": 1771726099.531,
+        "expires_at": 1771812499.531
+      },
+      {
+        "id": "story_cristiano_1",
+        "display_url": "https://picsum.photos/seed/cristianostory1/400/700",
+        "is_video": false,
+        "video_url": null,
+        "timestamp": 1771722499.531,
+        "expires_at": 1771808899.531
+      },
+      {
+        "id": "story_cristiano_2",
+        "display_url": "https://picsum.photos/seed/cristianostory2/400/700",
+        "is_video": false,
+        "video_url": null,
+        "timestamp": 1771718899.531,
+        "expires_at": 1771805299.531
+      }
+    ]
+  }
+}

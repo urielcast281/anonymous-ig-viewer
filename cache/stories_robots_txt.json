@@ -1,0 +1,21 @@
+{
+  "timestamp": 1771726106611,
+  "type": "stories",
+  "identifier": "robots.txt",
+  "data": {
+    "user": {
+      "username": "robots.txt",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=robots.txt&background=E1306C&color=fff&size=150"
+    },
+    "stories": [
+      {
+        "id": "story_robots.txt_0",
+        "display_url": "https://picsum.photos/seed/robots.txtstory0/400/700",
+        "is_video": true,
+        "video_url": null,
+        "timestamp": 1771726106.611,
+        "expires_at": 1771812506.611
+      }
+    ]
+  }
+}

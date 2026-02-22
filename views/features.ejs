@@ -1,0 +1,18 @@
+<div class="container" style="padding: 40px 0;">
+  <div class="section-header">
+    <h1 class="section-title">Features</h1>
+    <p class="section-subtitle">Everything you need for anonymous Instagram viewing</p>
+  </div>
+  <div class="features-grid">
+    <% features.forEach(f => { %>
+    <div class="feature-card">
+      <div class="feature-icon"><%= f.icon %></div>
+      <h3><%= f.title %></h3>
+      <p><%= f.description %></p>
+    </div>
+    <% }) %>
+  </div>
+  <div style="text-align: center; margin-top: 40px;">
+    <a href="/" class="btn btn-primary">🔍 Start Using InstaViewer</a>
+  </div>
+</div>

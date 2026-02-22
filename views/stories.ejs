@@ -1,0 +1,471 @@
+<div class="stories-container">
+    <!-- Stories Header -->
+    <div class="stories-header">
+        <div class="container">
+            <div class="stories-navigation">
+                <a href="/profile/<%= username %>" class="back-link">
+                    ← Back to Profile
+                </a>
+                <div class="stories-title">
+                    <h1>Stories by @<%= username %></h1>
+                    <% if (stories && stories.stories) { %>
+                    <p class="stories-count"><%= stories.stories.length %> active stories</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% if (stories && stories.stories && stories.stories.length > 0) { %>
+    <!-- Interstitial Ad (shown before stories) -->
+    <% if (config.ADS.ENABLE_ADS) { %>
+    <div class="interstitial-overlay" id="interstitialAd">
+        <div class="interstitial-content">
+            <div class="interstitial-header">
+                <h3>Loading Stories...</h3>
+                <button class="close-interstitial" onclick="closeInterstitial()">✕</button>
+            </div>
+            <div class="ad-slot ad-interstitial" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INTERSTITIAL %>">
+                <ins class="adsbygoogle"
+                     style="display:inline-block;width:320px;height:480px"
+                     data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                     data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INTERSTITIAL %>"></ins>
+            </div>
+            <div class="interstitial-footer">
+                <button class="btn btn-primary" onclick="closeInterstitial()">
+                    Continue to Stories
+                </button>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Stories Viewer -->
+    <div class="stories-viewer" id="storiesViewer">
+        <div class="stories-progress">
+            <% stories.stories.forEach((story, index) => { %>
+            <div class="progress-bar" id="progress-<%= index %>">
+                <div class="progress-fill"></div>
+            </div>
+            <% }) %>
+        </div>
+
+        <div class="stories-content">
+            <!-- Story Navigation -->
+            <button class="story-nav story-prev" onclick="previousStory()" id="prevBtn">
+                <span class="nav-icon">‹</span>
+            </button>
+            <button class="story-nav story-next" onclick="nextStory()" id="nextBtn">
+                <span class="nav-icon">›</span>
+            </button>
+
+            <!-- Stories Container -->
+            <div class="stories-carousel" id="storiesCarousel">
+                <% stories.stories.forEach((story, index) => { %>
+                <div class="story-slide" data-index="<%= index %>" id="story-<%= index %>">
+                    <div class="story-header">
+                        <div class="story-user-info">
+                            <img src="<%= (stories.user && stories.user.profile_pic_url) || '/images/default-avatar.jpg' %>" 
+                                 alt="<%= username %>" 
+                                 class="story-avatar">
+                            <div class="story-user-details">
+                                <span class="story-username">@<%= username %></span>
+                                <span class="story-time">
+                                    <%= Math.floor((Date.now() / 1000 - story.timestamp) / 3600) %>h ago
+                                </span>
+                            </div>
+                        </div>
+                        <div class="story-actions">
+                            <button onclick="downloadStory('<%= story.id %>', '<%= story.is_video ? story.video_url : story.display_url %>', '<%= username %>', <%= story.is_video %>)" 
+                                    class="story-download">
+                                📥
+                            </button>
+                            <button onclick="shareStory('<%= username %>', '<%= story.id %>')" class="story-share">
+                                📤
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="story-media">
+                        <% if (story.is_video) { %>
+                        <video class="story-video" 
+                               controls 
+                               muted 
+                               autoplay 
+                               loop 
+                               poster="<%= story.display_url %>"
+                               onloadeddata="startStoryTimer()">
+                            <source src="<%= story.video_url %>" type="video/mp4">
+                            <img src="<%= story.display_url %>" alt="Story by <%= username %>">
+                        </video>
+                        <% } else { %>
+                        <img src="<%= story.display_url %>" 
+                             alt="Story by <%= username %>" 
+                             class="story-image"
+                             onload="startStoryTimer()">
+                        <% } %>
+                    </div>
+
+                    <!-- Story Controls -->
+                    <div class="story-controls">
+                        <div class="story-info">
+                            <p class="story-id">Story #<%= index + 1 %> of <%= stories.stories.length %></p>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <!-- Stories Footer -->
+        <div class="stories-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="story-navigation-dots">
+                        <% stories.stories.forEach((story, index) => { %>
+                        <button class="nav-dot <%= index === 0 ? 'active' : '' %>" 
+                                onclick="goToStory(<%= index %>)" 
+                                data-index="<%= index %>"></button>
+                        <% }) %>
+                    </div>
+                    
+                    <div class="story-actions-bar">
+                        <button onclick="pauseStories()" class="control-btn" id="pauseBtn">
+                            <span id="pauseIcon">⏸️</span> Pause
+                        </button>
+                        <button onclick="toggleFullscreen()" class="control-btn">
+                            🔍 Fullscreen
+                        </button>
+                        <a href="/profile/<%= username %>" class="control-btn">
+                            👤 View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Ad (Desktop) -->
+    <% if (config.ADS.ENABLE_ADS) { %>
+    <div class="stories-sidebar">
+        <div class="ad-slot ad-sidebar-stories" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>">
+            <div class="ad-label">Advertisement</div>
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:300px;height:600px"
+                 data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+                 data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>"></ins>
+        </div>
+    </div>
+    <% } %>
+
+    <% } else { %>
+    <!-- No Stories Available -->
+    <div class="no-stories-section">
+        <div class="container">
+            <div class="empty-state">
+                <div class="empty-icon">📸</div>
+                <h2>No Active Stories</h2>
+                <% if (typeof noStoriesMessage !== 'undefined') { %>
+                <p><%= noStoriesMessage %></p>
+                <% } else { %>
+                <p>@<%= username %> currently has no active stories. Stories disappear after 24 hours.</p>
+                <% } %>
+                
+                <div class="empty-actions">
+                    <a href="/profile/<%= username %>" class="btn btn-primary">
+                        👤 View Profile Instead
+                    </a>
+                    <a href="/" class="btn btn-outline">
+                        🔍 Search Another User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Profiles when no stories -->
+    <% if (relatedProfiles && relatedProfiles.length > 0) { %>
+    <div class="related-section">
+        <div class="container">
+            <h3>Try These Profiles</h3>
+            <div class="related-grid">
+                <% relatedProfiles.forEach(item => { %>
+                <div class="related-profile">
+                    <a href="/stories/<%= item.username %>" class="related-link">
+                        <img src="<%= item.profile?.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                             alt="<%= item.username %>" 
+                             class="related-avatar">
+                        <div class="related-info">
+                            <div class="related-username">@<%= item.username %></div>
+                            <div class="related-action">View Stories</div>
+                        </div>
+                    </a>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    <% } %>
+    <% } %>
+</div>
+
+<!-- Stories JavaScript -->
+<script>
+let currentStoryIndex = 0;
+let storyTimer = null;
+let isPaused = false;
+let totalStories = <%= stories && stories.stories ? stories.stories.length : 0 %>;
+
+// Story navigation functions
+function nextStory() {
+    if (currentStoryIndex < totalStories - 1) {
+        goToStory(currentStoryIndex + 1);
+    } else {
+        // End of stories, redirect to profile
+        window.location.href = '/profile/<%= username %>';
+    }
+}
+
+function previousStory() {
+    if (currentStoryIndex > 0) {
+        goToStory(currentStoryIndex - 1);
+    }
+}
+
+function goToStory(index) {
+    if (index < 0 || index >= totalStories) return;
+    
+    // Clear current timer
+    if (storyTimer) {
+        clearTimeout(storyTimer);
+    }
+    
+    // Hide current story
+    const currentStory = document.getElementById(`story-${currentStoryIndex}`);
+    if (currentStory) {
+        currentStory.style.display = 'none';
+    }
+    
+    // Update progress bars
+    updateProgressBars(index);
+    
+    // Show new story
+    const newStory = document.getElementById(`story-${index}`);
+    if (newStory) {
+        newStory.style.display = 'block';
+        currentStoryIndex = index;
+        
+        // Update navigation dots
+        updateNavigationDots(index);
+        
+        // Start auto-advance timer
+        if (!isPaused) {
+            startStoryTimer();
+        }
+    }
+}
+
+function updateProgressBars(activeIndex) {
+    for (let i = 0; i < totalStories; i++) {
+        const progressBar = document.getElementById(`progress-${i}`);
+        const progressFill = progressBar.querySelector('.progress-fill');
+        
+        if (i < activeIndex) {
+            // Completed stories
+            progressFill.style.width = '100%';
+        } else if (i === activeIndex) {
+            // Current story
+            progressFill.style.width = '0%';
+            if (!isPaused) {
+                progressFill.style.transition = 'width 5s linear';
+                progressFill.style.width = '100%';
+            }
+        } else {
+            // Future stories
+            progressFill.style.width = '0%';
+        }
+    }
+}
+
+function updateNavigationDots(activeIndex) {
+    const dots = document.querySelectorAll('.nav-dot');
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === activeIndex);
+    });
+}
+
+function startStoryTimer() {
+    if (isPaused) return;
+    
+    // Auto-advance after 5 seconds
+    storyTimer = setTimeout(() => {
+        nextStory();
+    }, 5000);
+}
+
+function pauseStories() {
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pauseBtn');
+    const pauseIcon = document.getElementById('pauseIcon');
+    
+    if (isPaused) {
+        clearTimeout(storyTimer);
+        pauseIcon.textContent = '▶️';
+        pauseBtn.innerHTML = '<span id="pauseIcon">▶️</span> Resume';
+        
+        // Pause progress bars
+        const progressFill = document.querySelector(`#progress-${currentStoryIndex} .progress-fill`);
+        if (progressFill) {
+            progressFill.style.animationPlayState = 'paused';
+        }
+    } else {
+        startStoryTimer();
+        pauseIcon.textContent = '⏸️';
+        pauseBtn.innerHTML = '<span id="pauseIcon">⏸️</span> Pause';
+        
+        // Resume progress bars
+        const progressFill = document.querySelector(`#progress-${currentStoryIndex} .progress-fill`);
+        if (progressFill) {
+            progressFill.style.animationPlayState = 'running';
+        }
+    }
+}
+
+function downloadStory(storyId, mediaUrl, username, isVideo) {
+    const extension = isVideo ? 'mp4' : 'jpg';
+    const filename = `${username}_story_${storyId}.${extension}`;
+    
+    const link = document.createElement('a');
+    link.href = mediaUrl;
+    link.download = filename;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function shareStory(username, storyId) {
+    const url = `${window.location.origin}/stories/${username}/${storyId}`;
+    const text = `Check out this story by @${username} on InstaViewer`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: text,
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Story URL copied to clipboard!');
+        });
+    }
+}
+
+function toggleFullscreen() {
+    const viewer = document.getElementById('storiesViewer');
+    
+    if (!document.fullscreenElement) {
+        viewer.requestFullscreen().catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+        case 'ArrowRight':
+        case ' ':
+            e.preventDefault();
+            nextStory();
+            break;
+        case 'ArrowLeft':
+            e.preventDefault();
+            previousStory();
+            break;
+        case 'Escape':
+            window.location.href = '/profile/<%= username %>';
+            break;
+        case 'p':
+        case 'P':
+            pauseStories();
+            break;
+    }
+});
+
+// Touch navigation for mobile
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+});
+
+document.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    
+    if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+            nextStory(); // Swipe left = next
+        } else {
+            previousStory(); // Swipe right = previous
+        }
+    }
+});
+
+// Interstitial ad functions
+<% if (config.ADS.ENABLE_ADS) { %>
+function closeInterstitial() {
+    document.getElementById('interstitialAd').style.display = 'none';
+    // Start the first story
+    if (totalStories > 0) {
+        goToStory(0);
+    }
+}
+
+// Show interstitial for 3 seconds, then allow closing
+setTimeout(() => {
+    const closeBtn = document.querySelector('.close-interstitial');
+    if (closeBtn) {
+        closeBtn.style.display = 'block';
+    }
+}, 3000);
+<% } else { %>
+// No interstitial, start immediately
+document.addEventListener('DOMContentLoaded', () => {
+    if (totalStories > 0) {
+        goToStory(0);
+    }
+});
+<% } %>
+
+// Initialize stories viewer
+document.addEventListener('DOMContentLoaded', () => {
+    // Hide all stories initially
+    for (let i = 0; i < totalStories; i++) {
+        const story = document.getElementById(`story-${i}`);
+        if (story) {
+            story.style.display = 'none';
+        }
+    }
+    
+    <% if (!config.ADS.ENABLE_ADS) { %>
+    // Start first story if no interstitial
+    if (totalStories > 0) {
+        setTimeout(() => goToStory(0), 500);
+    }
+    <% } %>
+});
+</script>
+
+<!-- Initialize ads -->
+<% if (config.ADS.ENABLE_ADS) { %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    setTimeout(function() {
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    }, 1000);
+});
+</script>
+<% } %>
