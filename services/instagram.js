@@ -89,7 +89,7 @@ class InstagramService {
 
     // Method 1: RapidAPI
     try {
-      const rapid = await this.fetchViaRapidAPI('v1/info', { username_or_id_or_url: username });
+      const rapid = await this.fetchViaRapidAPI('userinfo/', { username_or_id: username });
       if (rapid && rapid.data) {
         profileData = this.normalizeRapidAPIProfile(rapid.data);
       }
@@ -131,7 +131,7 @@ class InstagramService {
 
     // RapidAPI stories
     try {
-      const rapid = await this.fetchViaRapidAPI('v1/stories', { username_or_id_or_url: username });
+      const rapid = await this.fetchViaRapidAPI('stories/', { username_or_id: username });
       if (rapid && rapid.data) {
         storiesData = this.normalizeRapidAPIStories(rapid.data, username);
       }
@@ -153,7 +153,7 @@ class InstagramService {
     let postData = null;
 
     try {
-      const rapid = await this.fetchViaRapidAPI('v1/post_info', { code_or_id_or_url: shortcode });
+      const rapid = await this.fetchViaRapidAPI('post_info/', { code_or_id_or_url: shortcode });
       if (rapid && rapid.data) {
         postData = this.normalizeRapidAPIPost(rapid.data);
       }
@@ -175,7 +175,7 @@ class InstagramService {
 
     // Try RapidAPI search
     try {
-      const rapid = await this.fetchViaRapidAPI('v1/search_users', { search_query: query });
+      const rapid = await this.fetchViaRapidAPI('search_users/', { search_query: query });
       if (rapid && rapid.data && rapid.data.items) {
         results = rapid.data.items.map(u => this.normalizeSearchResult(u));
       }
