@@ -44,10 +44,14 @@ app.use(helmet({
 
 app.use(compression());
 app.use(cors());
+
+// Static files FIRST (before rate limiter so CSS/JS/images always load)
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '7d' }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate Limiting
+// Rate Limiting (only applies to dynamic routes, not static files)
 const rateLimiter = new RateLimiterMemory({
   keyGenerator: (req) => req.ip,
   points: config.RATE_LIMIT.MAX_REQUESTS,
@@ -62,9 +66,6 @@ app.use(async (req, res, next) => {
     res.status(429).json({ error: 'Too Many Requests', message: 'Please try again later' });
   }
 });
-
-// Static files
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '7d' }));
 
 // View engine
 app.set('view engine', 'ejs');
