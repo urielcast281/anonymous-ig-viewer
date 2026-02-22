@@ -1,20 +1,24 @@
 const axios = require('axios');
 
 async function test() {
-  try {
-    const resp = await axios.get('https://instagram-scraper-20251.p.rapidapi.com/userinfo/', {
-      params: { username_or_id: 'instagram' },
-      headers: {
-        'X-RapidAPI-Key': '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf',
-        'X-RapidAPI-Host': 'instagram-scraper-20251.p.rapidapi.com',
-      },
-      timeout: 15000,
-    });
-    console.log('Status:', resp.status);
-    console.log('Data keys:', Object.keys(resp.data));
-    console.log(JSON.stringify(resp.data).slice(0, 2000));
-  } catch (e) {
-    console.log('Error:', e.response?.status, e.response?.data || e.message);
+  const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
+  const hosts = [
+    'instagram-scraper-api2.p.rapidapi.com',
+    'instagram-scraper-20251.p.rapidapi.com',
+    'instagram-bulk-profile-scrapper.p.rapidapi.com',
+  ];
+
+  for (const host of hosts) {
+    try {
+      const r = await axios.get(`https://${host}/v1/info`, {
+        params: { username_or_id_or_url: 'instagram' },
+        headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
+        timeout: 10000,
+      });
+      console.log(`${host}: ${r.status} OK`, JSON.stringify(r.data).slice(0, 200));
+    } catch (e) {
+      console.log(`${host}: FAIL ${e.response?.status || e.message}`, JSON.stringify(e.response?.data || '').slice(0, 200));
+    }
   }
 }
 test();

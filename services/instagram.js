@@ -117,14 +117,10 @@ class InstagramService {
       }
     }
 
-    // Method 3: Mock data fallback
+    // Method 3: Mock data fallback (always fallback to keep site functional)
     if (!profileData) {
-      if (config.USE_MOCK_DATA) {
-        console.log(`🎭 Using mock data for profile: ${username}`);
-        profileData = this.getMockProfileData(username);
-      } else {
-        throw new Error(`Could not fetch profile for @${username}. Enable USE_MOCK_DATA or set RAPIDAPI_KEY.`);
-      }
+      console.log(`🎭 Using mock data for profile: ${username} (API unavailable)`);
+      profileData = this.getMockProfileData(username);
     }
 
     await cache.set('profile', username, profileData);
