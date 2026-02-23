@@ -4,18 +4,37 @@ const instagram = require('../services/instagram');
 const seo = require('../utils/seo');
 const config = require('../config');
 
+// Simple in-memory cache for trending profiles (refresh every 6 hours)
+let trendingCache = { data: null, ts: 0 };
+const TRENDING_CACHE_MS = 6 * 60 * 60 * 1000;
+
+async function getTrendingProfiles() {
+  if (trendingCache.data && Date.now() - trendingCache.ts < TRENDING_CACHE_MS) {
+    return trendingCache.data;
+  }
+  const usernames = config.TRENDING_PROFILES.slice(0, 8);
+  const results = await Promise.allSettled(
+    usernames.map(u => instagram.getProfile(u).then(p => ({ username: u, profile: p || null, success: !!p })))
+  );
+  const profiles = results.map((r, i) => 
+    r.status === 'fulfilled' && r.value.profile ? r.value : { username: usernames[i], profile: null, success: false }
+  );
+  trendingCache = { data: profiles, ts: Date.now() };
+  return profiles;
+}
+
 // Homepage
 router.get('/', async (req, res) => {
   try {
     const metaData = seo.getHomeMeta();
     const structuredData = seo.getHomeStructuredData();
 
-    // Quick mock trending (no async fetch needed for mock)
-    const trendingProfiles = config.TRENDING_PROFILES.slice(0, 8).map(username => ({
-      username,
-      profile: null,
-      success: false,
-    }));
+    let trendingProfiles;
+    try {
+      trendingProfiles = await getTrendingProfiles();
+    } catch (e) {
+      trendingProfiles = config.TRENDING_PROFILES.slice(0, 8).map(u => ({ username: u, profile: null, success: false }));
+    }
 
     res.render('home', {
       metaData,

@@ -134,10 +134,12 @@
                 <div class="profile-card">
                     <a href="/profile/<%= item.username %>" class="profile-link">
                         <div class="profile-header">
-                            <img src="<%= item.profile?.profile_pic_url || '/images/default-avatar.jpg' %>" 
+                            <img src="<%= item.profile?.profile_pic_url || '' %>" 
                                  alt="<%= item.username %>" 
                                  class="profile-avatar"
-                                 loading="lazy">
+                                 loading="lazy"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                            <div class="profile-avatar-placeholder" style="display:none;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#833AB4,#E1306C,#F77737);align-items:center;justify-content:center;font-size:28px;color:white;font-weight:700;"><%= item.username.charAt(0).toUpperCase() %></div>
                             <% if (item.profile?.is_verified) { %>
                             <span class="verified-badge">✓</span>
                             <% } %>

@@ -53,12 +53,14 @@
                     </a>
                 </div>
                 
+                <% if (currentPath !== '/') { %>
                 <div class="nav-search">
                     <form action="/search" method="GET" class="search-form">
                         <input type="text" name="q" class="search-input" placeholder="Search Instagram username..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" required>
                         <button type="submit" class="search-btn"><span class="search-icon">🔍</span></button>
                     </form>
                 </div>
+                <% } %>
                 
                 <div class="nav-menu">
                     <a href="/" class="nav-link <%= currentPath === '/' ? 'active' : '' %>">Home</a>
