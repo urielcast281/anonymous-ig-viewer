@@ -25,7 +25,27 @@ class InstagramService {
       });
       if (r.status === 200 && r.data) return r.data;
     } catch (e) {
-      console.log(`API ${endpoint} failed: ${e.response?.status || e.message}`);
+      console.log(`API (instagram120) ${endpoint} failed: ${e.response?.status || e.message}`);
+    }
+    return null;
+  }
+
+  // ─── Fallback: instagram-scraper-api2 (GET-based) ───
+  async apiCallV2(endpoint, params) {
+    if (!RAPIDAPI_KEY) return null;
+    const HOST2 = 'instagram-scraper-api2.p.rapidapi.com';
+    try {
+      const r = await axios.get(`https://${HOST2}${endpoint}`, {
+        params,
+        headers: {
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': HOST2,
+        },
+        timeout: 15000,
+      });
+      if (r.status === 200 && r.data) return r.data;
+    } catch (e) {
+      console.log(`API (scraper-v2) ${endpoint} failed: ${e.response?.status || e.message}`);
     }
     return null;
   }
@@ -80,6 +100,48 @@ class InstagramService {
       }
     } catch (e) {
       console.log(`Profile fetch failed: ${e.message}`);
+    }
+
+    // Fallback: try instagram-scraper-api2
+    if (!profileData) {
+      try {
+        console.log(`🔄 Trying fallback API (scraper-v2) for: ${username}`);
+        const v2Resp = await this.apiCallV2('/v1/info', { username_or_id_or_url: username });
+        if (v2Resp && v2Resp.data) {
+          const p = v2Resp.data;
+          const posts = p.edge_owner_to_timeline_media?.edges || [];
+          profileData = {
+            id: p.id || p.pk,
+            username: p.username,
+            full_name: p.full_name || p.username,
+            biography: p.biography || '',
+            profile_pic_url: p.profile_pic_url || '/images/default-avatar.svg',
+            profile_pic_url_hd: p.profile_pic_url_hd || p.profile_pic_url || '/images/default-avatar.svg',
+            followers_count: p.edge_followed_by?.count || p.follower_count || 0,
+            following_count: p.edge_follow?.count || p.following_count || 0,
+            posts_count: p.edge_owner_to_timeline_media?.count || p.media_count || 0,
+            is_verified: p.is_verified || false,
+            is_private: p.is_private || false,
+            external_url: p.external_url || '',
+            recent_posts: posts.slice(0, 12).map((item, i) => {
+              const node = item.node || item;
+              return {
+                id: node.id || node.pk || `post_${i}`,
+                shortcode: node.shortcode || `code_${i}`,
+                display_url: node.display_url || node.thumbnail_src || '',
+                thumbnail_url: node.thumbnail_src || node.display_url || '',
+                is_video: node.is_video || false,
+                likes_count: node.edge_liked_by?.count || node.like_count || 0,
+                comments_count: node.edge_media_to_comment?.count || node.comment_count || 0,
+                caption: node.edge_media_to_caption?.edges?.[0]?.node?.text || '',
+                timestamp: node.taken_at_timestamp || (Date.now() / 1000 - i * 86400),
+              };
+            }),
+          };
+        }
+      } catch (e) {
+        console.log(`Fallback API failed: ${e.message}`);
+      }
     }
 
     // Fallback to mock

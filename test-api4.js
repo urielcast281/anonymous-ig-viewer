@@ -1,37 +1,31 @@
+// Test: scrape Instagram profile page directly (no API needed)
 const axios = require('axios');
-const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
 
-// Try the most popular Instagram APIs with correct endpoints
-async function tryAPI(name, host, method, endpoint, params, body) {
+async function scrapeProfile(username) {
   try {
-    const opts = {
-      method: method || 'GET',
-      url: `https://${host}${endpoint}`,
-      headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
+    // Instagram's public web profile JSON endpoint
+    const r = await axios.get(`https://www.instagram.com/api/v1/users/web_profile_info/?username=${username}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'X-IG-App-ID': '936619743392459',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
       timeout: 15000,
-    };
-    if (params) opts.params = params;
-    if (body) { opts.data = body; opts.headers['Content-Type'] = 'application/x-www-form-urlencoded'; }
-    const r = await axios(opts);
-    console.log(`✅ ${name}: ${r.status}`, JSON.stringify(r.data).slice(0, 400));
-    return true;
+    });
+    const user = r.data?.data?.user;
+    if (user) {
+      console.log('SUCCESS! username:', user.username);
+      console.log('full_name:', user.full_name);
+      console.log('followers:', user.edge_followed_by?.count);
+      console.log('pic:', user.profile_pic_url_hd?.substring(0, 100));
+      console.log('posts:', user.edge_owner_to_timeline_media?.count);
+      console.log('first post pic:', user.edge_owner_to_timeline_media?.edges?.[0]?.node?.display_url?.substring(0, 100));
+    } else {
+      console.log('No user data. Response:', JSON.stringify(r.data).substring(0, 300));
+    }
   } catch (e) {
-    console.log(`❌ ${name}: ${e.response?.status}`, JSON.stringify(e.response?.data || e.message).slice(0, 200));
-    return false;
+    console.log('Error:', e.response?.status, e.response?.data ? JSON.stringify(e.response.data).substring(0, 200) : e.message);
   }
 }
 
-async function main() {
-  // Instagram Scraper API2 (most popular, 10K+ users)
-  await tryAPI('scraper-api2', 'instagram-scraper-api2.p.rapidapi.com', 'GET', '/v1/info', { username_or_id_or_url: 'instagram' });
-  
-  // Instagram Scraper by junioroangel
-  await tryAPI('junioroangel', 'instagram-scraper.p.rapidapi.com', 'GET', '/user_info', { username: 'instagram' });
-
-  // Instagram Looter2
-  await tryAPI('looter2', 'instagram-looter2.p.rapidapi.com', 'GET', '/profile', { username: 'instagram' });
-
-  // RocketAPI for Instagram  
-  await tryAPI('rocketapi', 'rocketapi-for-instagram.p.rapidapi.com', 'POST', '/instagram/user/get_info', null, 'username=instagram');
-}
-main();
+scrapeProfile('harimwick');

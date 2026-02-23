@@ -1,24 +1,15 @@
 const axios = require('axios');
+const KEY = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
 
-async function test() {
-  const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
-  const hosts = [
-    'instagram-scraper-api2.p.rapidapi.com',
-    'instagram-scraper-20251.p.rapidapi.com',
-    'instagram-bulk-profile-scrapper.p.rapidapi.com',
-  ];
-
-  for (const host of hosts) {
-    try {
-      const r = await axios.get(`https://${host}/v1/info`, {
-        params: { username_or_id_or_url: 'instagram' },
-        headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
-        timeout: 10000,
-      });
-      console.log(`${host}: ${r.status} OK`, JSON.stringify(r.data).slice(0, 200));
-    } catch (e) {
-      console.log(`${host}: FAIL ${e.response?.status || e.message}`, JSON.stringify(e.response?.data || '').slice(0, 200));
-    }
-  }
-}
-test();
+axios.post('https://instagram120.p.rapidapi.com/api/instagram/profile', 
+  { username: 'harimwick' },
+  { headers: { 'X-RapidAPI-Key': KEY, 'X-RapidAPI-Host': 'instagram120.p.rapidapi.com', 'Content-Type': 'application/json' }, timeout: 15000 }
+).then(r => {
+  console.log('status:', r.status);
+  console.log('hasResult:', !!r.data?.result);
+  console.log('username:', r.data?.result?.username);
+  console.log('pic:', (r.data?.result?.profile_pic_url || '').substring(0, 100));
+  console.log('followers:', r.data?.result?.edge_followed_by?.count || r.data?.result?.follower_count);
+}).catch(e => {
+  console.log('error:', e.response?.status, e.response?.data || e.message);
+});

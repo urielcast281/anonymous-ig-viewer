@@ -1,35 +1,33 @@
 const axios = require('axios');
-const key = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
+const KEY = '3613ebc26emsh8b60dbc9a77d681p1f2c8ajsne00c1eb6aaaf';
 
-async function tryAPI(name, host, endpoint, params) {
-  try {
-    const r = await axios.get(`https://${host}${endpoint}`, {
-      params,
-      headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': host },
-      timeout: 15000,
-    });
-    console.log(`✅ ${name}: ${r.status}`, JSON.stringify(r.data).slice(0, 300));
-    return true;
-  } catch (e) {
-    console.log(`❌ ${name}: ${e.response?.status || 'TIMEOUT'}`, JSON.stringify(e.response?.data || e.message).slice(0, 200));
-    return false;
+async function tryAPIs() {
+  const apis = [
+    { host: 'instagram-scraper-2022.p.rapidapi.com', url: '/ig/info_username/', params: { user: 'harimwick' }, method: 'get' },
+    { host: 'instagram-profile1.p.rapidapi.com', url: '/getprofile/harimwick', params: {}, method: 'get' },
+    { host: 'instagram28.p.rapidapi.com', url: '/user_info', params: { user_name: 'harimwick' }, method: 'get' },
+    { host: 'rocketapi-for-instagram.p.rapidapi.com', url: '/instagram/user/get_info', body: { username: 'harimwick' }, method: 'post' },
+  ];
+
+  for (const api of apis) {
+    try {
+      console.log(`\nTrying ${api.host}...`);
+      const config = {
+        headers: { 'X-RapidAPI-Key': KEY, 'X-RapidAPI-Host': api.host },
+        timeout: 15000
+      };
+      let r;
+      if (api.method === 'get') {
+        r = await axios.get(`https://${api.host}${api.url}`, { ...config, params: api.params });
+      } else {
+        r = await axios.post(`https://${api.host}${api.url}`, api.body, config);
+      }
+      console.log('Status:', r.status);
+      console.log('Sample:', JSON.stringify(r.data).substring(0, 500));
+    } catch (e) {
+      console.log('Error:', e.response?.status, (e.response?.data ? JSON.stringify(e.response.data).substring(0, 200) : e.message));
+    }
   }
 }
 
-async function main() {
-  // 1. Instagram Scraper (junioroangel)
-  await tryAPI('instagram-scraper', 'instagram-scraper.p.rapidapi.com', '/user_info', { username: 'instagram' });
-  
-  // 2. Instagram API Fast & Reliable
-  await tryAPI('fast-reliable', 'instagram-api-fast-reliable-data-scraper.p.rapidapi.com', '/user_info', { username: 'instagram' });
-  
-  // 3. Instagram Scraper Stable API
-  await tryAPI('stable-api', 'instagram-scraper-stable-api.p.rapidapi.com', '/user_info', { username: 'instagram' });
-  
-  // 4. Free Instagram Scraper
-  await tryAPI('free-scraper', 'free-instagram-scraper.p.rapidapi.com', '/user_info', { username: 'instagram' });
-
-  // 5. Instagram Scrapper Posts & Reels
-  await tryAPI('posts-reels', 'instagram-scrapper-posts-reels-stories-downloader.p.rapidapi.com', '/user_info', { username: 'instagram' });
-}
-main();
+tryAPIs();
