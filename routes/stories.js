@@ -30,25 +30,6 @@ router.get('/:username', async (req, res) => {
 
     // Try to get stories
     let stories = await instagram.getStories(username);
-    
-    // If no real stories, convert recent posts into stories-style view
-    if ((!stories || !stories.stories || stories.stories.length === 0) && profile && profile.recent_posts && profile.recent_posts.length > 0) {
-      stories = {
-        user: { 
-          username: profile.username, 
-          profile_pic_url: profile.profile_pic_url 
-        },
-        stories: profile.recent_posts.slice(0, 6).map((post, i) => ({
-          id: post.id || `post_story_${i}`,
-          display_url: post.display_url || post.thumbnail_url,
-          is_video: post.is_video || false,
-          video_url: null,
-          timestamp: post.timestamp || (Date.now() / 1000 - i * 3600),
-          expires_at: Date.now() / 1000 + 86400,
-          caption: post.caption || '',
-        })),
-      };
-    }
 
     if (!stories || !stories.stories || stories.stories.length === 0) {
       // Generate SEO meta data for no stories page
