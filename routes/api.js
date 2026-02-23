@@ -395,10 +395,12 @@ router.get('/img', async (req, res) => {
 router.get('/debug-api', async (req, res) => {
   const username = req.query.u || 'instagram';
   const key = process.env.RAPIDAPI_KEY;
+  const igDirect = require('../services/instagram-direct');
   const result = { 
     hasKey: !!key, 
     keyPrefix: key ? key.substring(0, 8) + '...' : 'MISSING',
     useMock: process.env.USE_MOCK_DATA,
+    directApi: { configured: igDirect.isConfigured, accounts: igDirect.accountCount },
   };
   
   try {

@@ -2,6 +2,7 @@ const axios = require('axios');
 const UserAgent = require('user-agents');
 const config = require('../config');
 const cache = require('./cache');
+const igDirect = require('./instagram-direct');
 
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'instagram120.p.rapidapi.com';
@@ -57,7 +58,22 @@ class InstagramService {
 
     let profileData = null;
 
-    // Try API: profile + posts in parallel
+    // Priority 1: Direct Instagram API (burner accounts) — most reliable
+    if (igDirect.isConfigured) {
+      try {
+        console.log(`📱 Trying direct IG API for: ${username} (${igDirect.accountCount} accounts)`);
+        profileData = await igDirect.getProfile(username);
+        if (profileData) {
+          console.log(`✅ Got real data for @${username} via direct API`);
+          await cache.set('profile', username, profileData);
+          return profileData;
+        }
+      } catch (e) {
+        console.log(`Direct API failed: ${e.message}`);
+      }
+    }
+
+    // Priority 2: RapidAPI instagram120
     try {
       const [profileResp, postsResp] = await Promise.all([
         this.apiCall('profile', { username }),
@@ -159,6 +175,19 @@ class InstagramService {
     if (cached) return cached;
 
     let storiesData = null;
+
+    // Priority 1: Direct API
+    if (igDirect.isConfigured) {
+      try {
+        storiesData = await igDirect.getStories(username);
+        if (storiesData) {
+          await cache.set('stories', username, storiesData);
+          return storiesData;
+        }
+      } catch (e) {
+        console.log(`Direct stories failed: ${e.message}`);
+      }
+    }
 
     // Need userId for stories endpoint — get from profile if not provided
     if (!userId) {
