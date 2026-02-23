@@ -425,7 +425,7 @@ router.get('/debug-api', async (req, res) => {
 // Clear cache
 router.get('/clear-cache', async (req, res) => {
   const cache = require('../services/cache');
-  await cache.clear();
+  await cache.clearAll();
   res.json({ cleared: true });
 });
 
