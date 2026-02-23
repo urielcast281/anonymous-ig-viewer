@@ -4,12 +4,12 @@ class SEOUtils {
   // Generate meta tags for homepage
   getHomeMeta() {
     return {
-      title: 'iPeep - Anonymous Instagram Story Viewer & Downloader | Free IG Viewer 2026',
-      description: 'View Instagram stories anonymously without login. Free Instagram story viewer, profile viewer & downloader. Best Picuki alternative. Watch IG stories without account. Save Instagram stories, reels & posts privately.',
+      title: 'iPeep - View Instagram Without Account | No Login Required | Free IG Viewer 2026',
+      description: 'View Instagram without an account — no login, no sign up needed. Browse stories, profiles, reels and posts anonymously without logging in. Free Instagram viewer, no registration required. Best Picuki & StoriesIG alternative 2026.',
       canonical: config.SEO.SITE_URL,
-      keywords: 'instagram story viewer, anonymous instagram viewer, view instagram stories anonymously, instagram story downloader, picuki alternative, ig story viewer, watch instagram stories without account, instagram viewer without login, free instagram viewer, insta story viewer, storiesig alternative, view ig stories anonymously, instagram anonymous viewer, download instagram stories, instagram profile viewer, instagram reels downloader, view instagram without account, instagram stalker, ig viewer, anonyig alternative, instagram story saver, best instagram viewer 2026, ver historias de instagram, ver stories de instagram anonimamente, descargar historias de instagram, ver perfil de instagram sin cuenta, visor de historias de instagram, instagram historias anonimo, ver instagram sin cuenta, baixar stories instagram, ver stories instagram anonimo, visualizador de instagram',
+      keywords: 'instagram story viewer, anonymous instagram viewer, view instagram without account, instagram without login, view instagram stories without logging in, instagram no sign up, browse instagram without account, instagram viewer no login required, instagram story downloader, picuki alternative, ig story viewer, watch instagram stories without account, instagram viewer without login, free instagram viewer, insta story viewer, storiesig alternative, view ig stories anonymously, instagram anonymous viewer, download instagram stories, instagram profile viewer, instagram reels downloader, instagram stalker, ig viewer, anonyig alternative, instagram story saver, best instagram viewer 2026, view instagram no account, instagram without registration, ver historias de instagram sin cuenta, ver stories de instagram anonimamente, ver instagram sin iniciar sesion, ver perfil de instagram sin cuenta, baixar stories instagram, ver stories instagram anonimo, visualizador de instagram',
       ogTitle: 'iPeep - Free Anonymous Instagram Story Viewer & Downloader',
-      ogDescription: 'View Instagram stories, profiles, reels and posts anonymously without creating an account. Download and save IG content. Best Picuki & StoriesIG alternative.',
+      ogDescription: 'View Instagram without an account or login. Browse stories, profiles, reels and posts anonymously — no sign up required. Best Picuki & StoriesIG alternative.',
       ogImage: `${config.SEO.SITE_URL}${config.SEO.DEFAULT_IMAGE}`,
       ogUrl: config.SEO.SITE_URL,
       twitterCard: 'summary_large_image',
