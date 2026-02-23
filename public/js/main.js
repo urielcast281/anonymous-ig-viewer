@@ -7,9 +7,6 @@ function toggleMobileMenu() {
   const navMenu = document.querySelector('.nav-menu');
   if (navMenu) {
     navMenu.classList.toggle('mobile-open');
-    navMenu.style.display = navMenu.classList.contains('mobile-open') 
-      ? 'flex' 
-      : '';
   }
 }
 
