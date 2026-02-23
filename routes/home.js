@@ -56,38 +56,11 @@ router.get('/', async (req, res) => {
 });
 
 // Search
-router.get('/search', async (req, res) => {
-  const query = req.query.q;
-  if (!query || !query.trim()) return res.redirect('/');
-
-  try {
-    const metaData = seo.getHomeMeta();
-    metaData.title = `Search Results for "${query}" - InstaViewer`;
-    metaData.description = `Search results for Instagram users matching "${query}".`;
-    const structuredData = seo.getHomeStructuredData();
-
-    const searchResults = await instagram.searchUsers(query.trim());
-
-    res.render('home', {
-      metaData,
-      structuredData,
-      trendingProfiles: [],
-      searchQuery: query,
-      searchResults,
-      pageTitle: `Search: ${query}`,
-    });
-  } catch (error) {
-    console.error('Search error:', error);
-    res.render('home', {
-      metaData: seo.getHomeMeta(),
-      structuredData: seo.getHomeStructuredData(),
-      trendingProfiles: [],
-      searchQuery: query,
-      searchResults: null,
-      searchError: 'Search is temporarily unavailable. Please try again later.',
-      pageTitle: `Search: ${query}`,
-    });
-  }
+router.get('/search', (req, res) => {
+  const query = (req.query.q || '').trim().replace(/^@/, '');
+  if (!query) return res.redirect('/');
+  // Usernames are unique — go directly to the profile page
+  res.redirect(`/profile/${encodeURIComponent(query.toLowerCase())}`);
 });
 
 // Quick profile redirect
