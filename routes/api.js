@@ -348,6 +348,32 @@ router.post('/profiles', async (req, res) => {
   }
 });
 
+// Image proxy — Instagram CDN URLs expire, so we proxy them server-side
+router.get('/img', async (req, res) => {
+  const url = req.query.url;
+  if (!url || (!url.startsWith('https://scontent') && !url.startsWith('https://instagram') && !url.startsWith('https://video'))) {
+    return res.status(400).send('Invalid URL');
+  }
+  try {
+    const https = require('https');
+    const parsed = new URL(url);
+    const proxyReq = https.get(parsed, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+    }, (proxyRes) => {
+      if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
+        return res.redirect(proxyRes.headers.location);
+      }
+      res.set('Content-Type', proxyRes.headers['content-type'] || 'image/jpeg');
+      res.set('Cache-Control', 'public, max-age=86400');
+      proxyRes.pipe(res);
+    });
+    proxyReq.on('error', () => res.status(502).send('Proxy error'));
+    proxyReq.setTimeout(10000, () => { proxyReq.destroy(); res.status(504).send('Timeout'); });
+  } catch (e) {
+    res.status(500).send('Error');
+  }
+});
+
 // Health check endpoint
 router.get('/health', (req, res) => {
   res.json({

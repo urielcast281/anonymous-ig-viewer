@@ -43,7 +43,7 @@
                 <div class="story-slide" data-index="<%= index %>" id="story-<%= index %>">
                     <div class="story-header">
                         <div class="story-user-info">
-                            <img src="<%= (stories.user && stories.user.profile_pic_url) || '/images/default-avatar.jpg' %>" 
+                            <img src="<%= (stories.user && stories.user.profile_pic_url) ? '/api/img?url=' + encodeURIComponent(stories.user.profile_pic_url) : '/images/default-avatar.jpg' %>" 
                                  alt="<%= username %>" 
                                  class="story-avatar">
                             <div class="story-user-details">
@@ -71,14 +71,14 @@
                                playsinline
                                webkit-playsinline
                                autoplay 
-                               poster="<%= story.display_url %>"
+                               poster="/api/img?url=<%= encodeURIComponent(story.display_url) %>"
                                onloadeddata="onVideoLoaded(this)"
                                onclick="this.paused ? this.play() : this.pause()">
-                            <source src="<%= story.video_url %>" type="video/mp4">
-                            <img src="<%= story.display_url %>" alt="Story by <%= username %>">
+                            <source src="/api/img?url=<%= encodeURIComponent(story.video_url) %>" type="video/mp4">
+                            <img src="/api/img?url=<%= encodeURIComponent(story.display_url) %>" alt="Story by <%= username %>">
                         </video>
                         <% } else { %>
-                        <img src="<%= story.display_url %>" 
+                        <img src="/api/img?url=<%= encodeURIComponent(story.display_url) %>" 
                              alt="Story by <%= username %>" 
                              class="story-image"
                              onload="startStoryTimer()">
