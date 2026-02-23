@@ -350,25 +350,41 @@ router.post('/profiles', async (req, res) => {
 
 // Image proxy — Instagram CDN URLs expire, so we proxy them server-side
 router.get('/img', async (req, res) => {
-  const url = req.query.url;
-  if (!url || (!url.startsWith('https://scontent') && !url.startsWith('https://instagram') && !url.startsWith('https://video'))) {
+  // Extract the raw url param from the original URL to avoid Express query parsing issues
+  const match = req.originalUrl.match(/[?&]url=([^&]+)/);
+  const url = match ? decodeURIComponent(match[1]) : null;
+  
+  if (!url || !url.startsWith('https://')) {
     return res.status(400).send('Invalid URL');
+  }
+  // Only allow Instagram CDN domains
+  const allowed = ['scontent', 'instagram', 'video', 'cdninstagram.com'];
+  const hostname = new URL(url).hostname;
+  if (!allowed.some(a => hostname.includes(a))) {
+    return res.status(403).send('Domain not allowed');
   }
   try {
     const https = require('https');
     const parsed = new URL(url);
     const proxyReq = https.get(parsed, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://www.instagram.com/',
+        'Accept': 'image/webp,image/avif,image/*,*/*'
+      }
     }, (proxyRes) => {
       if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
         return res.redirect(proxyRes.headers.location);
       }
+      // Override the JSON content-type from middleware
+      res.removeHeader('Content-Type');
       res.set('Content-Type', proxyRes.headers['content-type'] || 'image/jpeg');
       res.set('Cache-Control', 'public, max-age=86400');
+      res.set('Cross-Origin-Resource-Policy', 'cross-origin');
       proxyRes.pipe(res);
     });
     proxyReq.on('error', () => res.status(502).send('Proxy error'));
-    proxyReq.setTimeout(10000, () => { proxyReq.destroy(); res.status(504).send('Timeout'); });
+    proxyReq.setTimeout(15000, () => { proxyReq.destroy(); res.status(504).send('Timeout'); });
   } catch (e) {
     res.status(500).send('Error');
   }
