@@ -1726,21 +1726,17 @@ ul { list-style: none; }
    AD SLOTS
    ============================================ */
 .ad-slot {
-  background: var(--bg-secondary);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-sm);
   overflow: hidden;
   text-align: center;
-  min-height: 50px;
+}
+
+.ad-slot:empty,
+.ad-slot:not(:has(iframe)):not(:has(img)):not(:has(ins)) {
+  display: none;
 }
 
 .ad-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  padding: 4px 0;
-  opacity: 0.5;
+  display: none;
 }
 
 .ad-banner-top {
