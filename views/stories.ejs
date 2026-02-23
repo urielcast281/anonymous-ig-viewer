@@ -68,11 +68,12 @@
                         <% if (story.is_video) { %>
                         <video class="story-video" 
                                controls 
-                               muted 
+                               playsinline
+                               webkit-playsinline
                                autoplay 
-                               loop 
                                poster="<%= story.display_url %>"
-                               onloadeddata="startStoryTimer()">
+                               onloadeddata="onVideoLoaded(this)"
+                               onclick="this.paused ? this.play() : this.pause()">
                             <source src="<%= story.video_url %>" type="video/mp4">
                             <img src="<%= story.display_url %>" alt="Story by <%= username %>">
                         </video>
@@ -227,11 +228,24 @@ function goToStory(index) {
     // Update progress bars
     updateProgressBars(index);
     
+    // Pause any playing videos in old story
+    if (currentStory) {
+        const oldVideo = currentStory.querySelector('video');
+        if (oldVideo) { oldVideo.pause(); }
+    }
+
     // Show new story
     const newStory = document.getElementById(`story-${index}`);
     if (newStory) {
         newStory.style.display = 'block';
         currentStoryIndex = index;
+        
+        // Play video if this story has one
+        const newVideo = newStory.querySelector('video');
+        if (newVideo) {
+            newVideo.currentTime = 0;
+            newVideo.play().catch(() => {});
+        }
         
         // Update navigation dots
         updateNavigationDots(index);
@@ -281,31 +295,31 @@ function startStoryTimer() {
     }, 5000);
 }
 
+function onVideoLoaded(video) {
+    video.play().catch(() => {});
+    startStoryTimer();
+}
+
 function pauseStories() {
     isPaused = !isPaused;
     const pauseBtn = document.getElementById('pauseBtn');
-    const pauseIcon = document.getElementById('pauseIcon');
+    const currentStory = document.getElementById(`story-${currentStoryIndex}`);
+    const video = currentStory ? currentStory.querySelector('video') : null;
     
     if (isPaused) {
         clearTimeout(storyTimer);
-        pauseIcon.textContent = '▶️';
         pauseBtn.innerHTML = '<span id="pauseIcon">▶️</span> Resume';
+        if (video) video.pause();
         
-        // Pause progress bars
         const progressFill = document.querySelector(`#progress-${currentStoryIndex} .progress-fill`);
-        if (progressFill) {
-            progressFill.style.animationPlayState = 'paused';
-        }
+        if (progressFill) progressFill.style.animationPlayState = 'paused';
     } else {
         startStoryTimer();
-        pauseIcon.textContent = '⏸️';
         pauseBtn.innerHTML = '<span id="pauseIcon">⏸️</span> Pause';
+        if (video) video.play().catch(() => {});
         
-        // Resume progress bars
         const progressFill = document.querySelector(`#progress-${currentStoryIndex} .progress-fill`);
-        if (progressFill) {
-            progressFill.style.animationPlayState = 'running';
-        }
+        if (progressFill) progressFill.style.animationPlayState = 'running';
     }
 }
 
