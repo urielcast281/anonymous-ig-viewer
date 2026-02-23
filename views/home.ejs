@@ -121,72 +121,52 @@
     <% } %>
 
     <!-- Trending Profiles -->
-    <% if (trendingProfiles && trendingProfiles.length > 0) { %>
+    <!-- Quick Tools Section -->
     <div class="trending-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">🔥 Trending Profiles</h2>
-                <p class="section-subtitle">Most popular Instagram profiles to explore</p>
+                <h2 class="section-title">📸 What Can You Do?</h2>
+                <p class="section-subtitle">Browse Instagram anonymously — no account needed</p>
             </div>
-            
-            <div class="trending-grid">
-                <% trendingProfiles.forEach((item, index) => { %>
-                <div class="profile-card">
-                    <a href="/profile/<%= item.username %>" class="profile-link">
-                        <div class="profile-header">
-                            <img src="<%= item.profile?.profile_pic_url || '' %>" 
-                                 alt="<%= item.username %>" 
-                                 class="profile-avatar"
-                                 loading="lazy"
-                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                            <div class="profile-avatar-placeholder" style="display:none;width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#833AB4,#E1306C,#F77737);align-items:center;justify-content:center;font-size:28px;color:white;font-weight:700;"><%= item.username.charAt(0).toUpperCase() %></div>
-                            <% if (item.profile?.is_verified) { %>
-                            <span class="verified-badge">✓</span>
-                            <% } %>
-                        </div>
-                        
-                        <div class="profile-info">
-                            <h3 class="profile-username">@<%= item.username %></h3>
-                            <% if (item.profile?.full_name) { %>
-                            <p class="profile-fullname"><%= item.profile.full_name %></p>
-                            <% } %>
-                            
-                            <% if (item.profile) { %>
-                            <div class="profile-stats">
-                                <div class="stat">
-                                    <span class="stat-number"><%= seo.formatCount(item.profile.followers_count) %></span>
-                                    <span class="stat-label">Followers</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-number"><%= seo.formatCount(item.profile.posts_count) %></span>
-                                    <span class="stat-label">Posts</span>
-                                </div>
-                            </div>
-                            <% } %>
-                        </div>
-                    </a>
-                    
-                    <div class="profile-actions">
-                        <a href="/profile/<%= item.username %>" class="btn btn-primary">View Profile</a>
-                        <a href="/stories/<%= item.username %>" class="btn btn-outline">Stories</a>
-                    </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:30px;">
+                <a href="/instagram-story-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#833AB4,#E1306C);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
+                    <div style="font-size:40px;margin-bottom:12px;">👁️</div>
+                    <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">View Stories Anonymously</h3>
+                    <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">Watch anyone's stories without them knowing. No login required.</p>
+                </a>
+                <a href="/anonymous-instagram-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#405DE6,#5851DB);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
+                    <div style="font-size:40px;margin-bottom:12px;">👤</div>
+                    <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">Browse Profiles</h3>
+                    <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">See posts, followers, and bio without an account or signing up.</p>
+                </a>
+                <a href="/instagram-story-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#F77737,#FCAF45);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
+                    <div style="font-size:40px;margin-bottom:12px;">📥</div>
+                    <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">Download Stories & Reels</h3>
+                    <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">Save stories, reels, and posts to your phone. Free, no app needed.</p>
+                </a>
+            </div>
+
+            <!-- Ad slot -->
+            <div style="text-align:center;margin:24px 0;">
+                <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
+                <div id="container-7b466dd839b40ecfeb07def8c857f3b2"></div>
+            </div>
+
+            <!-- Quick search examples -->
+            <div style="text-align:center;margin-top:20px;">
+                <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Try searching for any public account:</p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+                    <a href="/search?q=instagram" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@instagram</a>
+                    <a href="/search?q=cristiano" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@cristiano</a>
+                    <a href="/search?q=selenagomez" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@selenagomez</a>
+                    <a href="/search?q=kyliejenner" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@kyliejenner</a>
+                    <a href="/search?q=therock" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@therock</a>
+                    <a href="/search?q=leomessi" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@leomessi</a>
                 </div>
-                
-                <!-- Ad after every 3 profiles -->
-                <% if (config.ADS.ENABLE_ADS && (index + 1) % 3 === 0 && index < trendingProfiles.length - 1) { %>
-                <div class="ad-slot ad-trending" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
-                    <div class="ad-label">Advertisement</div>
-                    <ins class="adsbygoogle"
-                         style="display:block;width:300px;height:250px"
-                         data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
-                         data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
-                </div>
-                <% } %>
-                <% }) %>
             </div>
         </div>
     </div>
-    <% } %>
 
     <!-- Features Section -->
     <div class="features-section">
