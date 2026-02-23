@@ -4,12 +4,12 @@ class SEOUtils {
   // Generate meta tags for homepage
   getHomeMeta() {
     return {
-      title: 'InstaViewer - View Instagram Stories & Profiles Anonymously',
-      description: 'View Instagram stories, profiles, and posts anonymously without login. Download Instagram content safely and privately. Free Instagram viewer tool.',
+      title: 'iPeep - Anonymous Instagram Story Viewer & Downloader | Free IG Viewer 2026',
+      description: 'View Instagram stories anonymously without login. Free Instagram story viewer, profile viewer & downloader. Best Picuki alternative. Watch IG stories without account. Save Instagram stories, reels & posts privately.',
       canonical: config.SEO.SITE_URL,
-      keywords: 'instagram viewer, instagram stories, anonymous instagram, instagram downloader, view instagram without account, instagram profile viewer',
-      ogTitle: 'Free Anonymous Instagram Viewer - Stories & Profiles',
-      ogDescription: 'View Instagram stories, profiles, and posts anonymously without creating an account. Safe, fast, and completely free.',
+      keywords: 'instagram story viewer, anonymous instagram viewer, view instagram stories anonymously, instagram story downloader, picuki alternative, ig story viewer, watch instagram stories without account, instagram viewer without login, free instagram viewer, insta story viewer, storiesig alternative, view ig stories anonymously, instagram anonymous viewer, download instagram stories, instagram profile viewer, instagram reels downloader, view instagram without account, instagram stalker, ig viewer, anonyig alternative, instagram story saver, best instagram viewer 2026',
+      ogTitle: 'iPeep - Free Anonymous Instagram Story Viewer & Downloader',
+      ogDescription: 'View Instagram stories, profiles, reels and posts anonymously without creating an account. Download and save IG content. Best Picuki & StoriesIG alternative.',
       ogImage: `${config.SEO.SITE_URL}${config.SEO.DEFAULT_IMAGE}`,
       ogUrl: config.SEO.SITE_URL,
       twitterCard: 'summary_large_image',
@@ -49,14 +49,14 @@ class SEOUtils {
 
   // Generate meta tags for story viewer pages
   getStoriesMeta(username) {
-    const title = `${username} Instagram Stories - View Anonymously`;
-    const description = `View @${username} Instagram stories anonymously without logging in. Watch stories privately and safely without the user knowing.`;
+    const title = `${username} Instagram Stories - View & Download Anonymously | iPeep`;
+    const description = `View @${username} Instagram stories anonymously without login. Download and save @${username}'s IG stories privately. Free anonymous story viewer — they'll never know.`;
 
     return {
       title,
       description,
       canonical: `${config.SEO.SITE_URL}/stories/${username}`,
-      keywords: `${username} stories, instagram stories, view ${username} stories, anonymous story viewer, instagram story downloader`,
+      keywords: `${username} stories, ${username} instagram stories, view ${username} stories anonymously, anonymous story viewer, instagram story downloader, ${username} ig stories, download ${username} stories`,
       ogTitle: title,
       ogDescription: description,
       ogImage: `${config.SEO.SITE_URL}${config.SEO.DEFAULT_IMAGE}`,
