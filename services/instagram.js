@@ -55,24 +55,25 @@ class InstagramService {
           biography: p.biography || p.bio || '',
           profile_pic_url: p.profile_pic_url || '/images/default-avatar.svg',
           profile_pic_url_hd: p.profile_pic_url_hd || p.hd_profile_pic_url_info?.url || p.profile_pic_url || '/images/default-avatar.svg',
-          followers_count: p.follower_count || p.edge_followed_by?.count || 0,
-          following_count: p.following_count || p.edge_follow?.count || 0,
-          posts_count: p.media_count || p.edge_owner_to_timeline_media?.count || 0,
+          followers_count: p.edge_followed_by?.count || p.follower_count || 0,
+          following_count: p.edge_follow?.count || p.following_count || 0,
+          posts_count: p.edge_owner_to_timeline_media?.count || p.media_count || 0,
           is_verified: p.is_verified || false,
           is_private: p.is_private || false,
           external_url: p.external_url || '',
           recent_posts: posts.slice(0, 12).map((item, i) => {
             const node = item.node || item;
+            const imgUrl = node.image_versions2?.candidates?.[0]?.url || node.display_url || node.thumbnail_src || `https://picsum.photos/400/400?random=${i}`;
             return {
               id: node.id || node.pk || `post_${i}`,
-              shortcode: node.shortcode || node.code || `code_${i}`,
-              display_url: node.display_url || node.image_versions2?.candidates?.[0]?.url || node.thumbnail_src || `https://picsum.photos/400/400?random=${i}`,
-              thumbnail_url: node.thumbnail_src || node.thumbnail_url || node.display_url || `https://picsum.photos/300/300?random=${i}`,
-              is_video: node.is_video || node.media_type === 2,
-              likes_count: node.edge_liked_by?.count || node.like_count || 0,
-              comments_count: node.edge_media_to_comment?.count || node.comment_count || 0,
-              caption: node.edge_media_to_caption?.edges?.[0]?.node?.text || node.caption?.text || '',
-              timestamp: node.taken_at_timestamp || node.taken_at || (Date.now() / 1000 - i * 86400),
+              shortcode: node.code || node.shortcode || `code_${i}`,
+              display_url: imgUrl,
+              thumbnail_url: node.thumbnail_src || node.thumbnail_url || imgUrl,
+              is_video: node.video_versions != null || node.is_video || node.media_type === 2,
+              likes_count: node.like_count || node.edge_liked_by?.count || 0,
+              comments_count: node.comment_count || node.edge_media_to_comment?.count || 0,
+              caption: node.caption?.text || node.edge_media_to_caption?.edges?.[0]?.node?.text || '',
+              timestamp: node.taken_at || node.taken_at_timestamp || (Date.now() / 1000 - i * 86400),
             };
           }),
         };
