@@ -350,9 +350,10 @@ router.post('/profiles', async (req, res) => {
 
 // Image proxy — Instagram CDN URLs expire, so we proxy them server-side
 router.get('/img', async (req, res) => {
-  // Extract the raw url param from the original URL to avoid Express query parsing issues
-  const match = req.originalUrl.match(/[?&]url=([^&]+)/);
-  const url = match ? decodeURIComponent(match[1]) : null;
+  // Extract the raw url param — grab everything after ?url= or &url= 
+  // since the Instagram URL itself contains & chars
+  const idx = req.originalUrl.indexOf('url=');
+  const url = idx !== -1 ? decodeURIComponent(req.originalUrl.substring(idx + 4)) : null;
   
   if (!url || !url.startsWith('https://')) {
     return res.status(400).send('Invalid URL');
