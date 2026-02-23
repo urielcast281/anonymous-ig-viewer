@@ -17,28 +17,6 @@
     </div>
 
     <% if (stories && stories.stories && stories.stories.length > 0) { %>
-    <!-- Interstitial Ad (shown before stories) -->
-    <% if (config.ADS.ENABLE_ADS) { %>
-    <div class="interstitial-overlay" id="interstitialAd">
-        <div class="interstitial-content">
-            <div class="interstitial-header">
-                <h3>Loading Stories...</h3>
-                <button class="close-interstitial" onclick="closeInterstitial()">✕</button>
-            </div>
-            <div class="ad-slot ad-interstitial" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INTERSTITIAL %>">
-                <ins class="adsbygoogle"
-                     style="display:inline-block;width:320px;height:480px"
-                     data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
-                     data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INTERSTITIAL %>"></ins>
-            </div>
-            <div class="interstitial-footer">
-                <button class="btn btn-primary" onclick="closeInterstitial()">
-                    Continue to Stories
-                </button>
-            </div>
-        </div>
-    </div>
-    <% } %>
 
     <!-- Stories Viewer -->
     <div class="stories-viewer" id="storiesViewer">
@@ -413,33 +391,7 @@ document.addEventListener('touchend', (e) => {
     }
 });
 
-// Interstitial ad functions
-<% if (config.ADS.ENABLE_ADS) { %>
-function closeInterstitial() {
-    document.getElementById('interstitialAd').style.display = 'none';
-    // Start the first story
-    if (totalStories > 0) {
-        goToStory(0);
-    }
-}
-
-// Show interstitial for 3 seconds, then allow closing
-setTimeout(() => {
-    const closeBtn = document.querySelector('.close-interstitial');
-    if (closeBtn) {
-        closeBtn.style.display = 'block';
-    }
-}, 3000);
-<% } else { %>
-// No interstitial, start immediately
-document.addEventListener('DOMContentLoaded', () => {
-    if (totalStories > 0) {
-        goToStory(0);
-    }
-});
-<% } %>
-
-// Initialize stories viewer
+// Initialize stories viewer - start immediately
 document.addEventListener('DOMContentLoaded', () => {
     // Hide all stories initially
     for (let i = 0; i < totalStories; i++) {
@@ -448,24 +400,11 @@ document.addEventListener('DOMContentLoaded', () => {
             story.style.display = 'none';
         }
     }
-    
-    <% if (!config.ADS.ENABLE_ADS) { %>
-    // Start first story if no interstitial
+    // Start first story
     if (totalStories > 0) {
-        setTimeout(() => goToStory(0), 500);
+        setTimeout(() => goToStory(0), 300);
     }
-    <% } %>
 });
 </script>
 
-<!-- Initialize ads -->
-<% if (config.ADS.ENABLE_ADS) { %>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    (adsbygoogle = window.adsbygoogle || []).push({});
-    setTimeout(function() {
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    }, 1000);
-});
-</script>
-<% } %>
+<!-- Ads loaded via layout -->
