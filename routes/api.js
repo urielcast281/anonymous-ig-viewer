@@ -391,6 +391,44 @@ router.get('/img', async (req, res) => {
   }
 });
 
+// Debug: test Instagram API
+router.get('/debug-api', async (req, res) => {
+  const username = req.query.u || 'instagram';
+  const key = process.env.RAPIDAPI_KEY;
+  const result = { 
+    hasKey: !!key, 
+    keyPrefix: key ? key.substring(0, 8) + '...' : 'MISSING',
+    useMock: process.env.USE_MOCK_DATA,
+  };
+  
+  try {
+    const axios = require('axios');
+    const resp = await axios.post('https://instagram120.p.rapidapi.com/api/instagram/profile', 
+      { username },
+      { 
+        headers: { 'X-RapidAPI-Key': key, 'X-RapidAPI-Host': 'instagram120.p.rapidapi.com', 'Content-Type': 'application/json' },
+        timeout: 15000 
+      }
+    );
+    result.status = resp.status;
+    result.hasData = !!resp.data;
+    result.hasResult = !!(resp.data && resp.data.result);
+    result.resultKeys = resp.data?.result ? Object.keys(resp.data.result).slice(0, 15) : [];
+    result.username = resp.data?.result?.username;
+    result.picUrl = resp.data?.result?.profile_pic_url?.substring(0, 80);
+  } catch (e) {
+    result.error = e.response?.status + ': ' + (e.response?.data ? JSON.stringify(e.response.data).substring(0, 200) : e.message);
+  }
+  res.json(result);
+});
+
+// Clear cache
+router.get('/clear-cache', async (req, res) => {
+  const cache = require('../services/cache');
+  await cache.clear();
+  res.json({ cleared: true });
+});
+
 // Health check endpoint
 router.get('/health', (req, res) => {
   res.json({
