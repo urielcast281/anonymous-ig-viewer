@@ -92,35 +92,89 @@ class InstagramService {
     return profileData;
   }
 
-  async getStories(username) {
+  async getStories(username, userId) {
     const cached = await cache.get('stories', username);
     if (cached) return cached;
 
     let storiesData = null;
 
-    try {
-      const resp = await this.apiCall('stories', { username });
-      if (resp && resp.result && Array.isArray(resp.result) && resp.result.length > 0) {
-        storiesData = {
-          user: { username, profile_pic_url: '/images/default-avatar.svg' },
-          stories: resp.result.map((s, i) => ({
-            id: s.id || s.pk || `story_${i}`,
-            display_url: s.image_versions2?.candidates?.[0]?.url || s.display_url || `https://picsum.photos/400/600?random=${i + 100}`,
-            is_video: s.media_type === 2 || s.is_video || false,
-            video_url: s.video_versions?.[0]?.url || null,
-            timestamp: s.taken_at || (Date.now() / 1000 - i * 3600),
-            expires_at: s.expiring_at || (Date.now() / 1000 + 86400),
-          })),
-        };
-      }
-    } catch (e) { /* fall through */ }
+    // Need userId for stories endpoint — get from profile if not provided
+    if (!userId) {
+      try {
+        const profileResp = await this.apiCall('profile', { username });
+        if (profileResp && profileResp.result) {
+          userId = profileResp.result.id;
+        }
+      } catch (e) { /* fall through */ }
+    }
 
+    // Fetch stories using userId
+    if (userId) {
+      try {
+        const resp = await this.apiCall('stories', { userId });
+        if (resp && resp.result && Array.isArray(resp.result) && resp.result.length > 0) {
+          storiesData = {
+            user: { username, profile_pic_url: '/images/default-avatar.svg' },
+            stories: resp.result.map((s, i) => ({
+              id: s.id || s.pk || `story_${i}`,
+              display_url: s.image_versions2?.candidates?.[0]?.url || s.display_url || `https://picsum.photos/400/600?random=${i + 100}`,
+              is_video: s.media_type === 2 || s.is_video || false,
+              video_url: s.video_versions?.[0]?.url || null,
+              timestamp: s.taken_at || (Date.now() / 1000 - i * 3600),
+              expires_at: s.expiring_at || (Date.now() / 1000 + 86400),
+            })),
+          };
+        }
+      } catch (e) { /* fall through */ }
+    }
+
+    // No active stories — return null (let routes handle fallback to posts)
     if (!storiesData) {
-      storiesData = this.getMockStoriesData(username);
+      storiesData = { user: { username, profile_pic_url: '/images/default-avatar.svg' }, stories: [] };
     }
 
     await cache.set('stories', username, storiesData);
     return storiesData;
+  }
+
+  // ─── Get Reels ───
+  async getReels(username, userId) {
+    const cached = await cache.get('reels', username);
+    if (cached) return cached;
+
+    if (!userId) {
+      try {
+        const profileResp = await this.apiCall('profile', { username });
+        if (profileResp && profileResp.result) userId = profileResp.result.id;
+      } catch (e) { /* fall through */ }
+    }
+
+    let reelsData = [];
+    if (userId) {
+      try {
+        const resp = await this.apiCall('reels', { userId });
+        if (resp && resp.result && resp.result.edges) {
+          reelsData = resp.result.edges.slice(0, 12).map((item, i) => {
+            const node = item.node?.media || item.node || item;
+            return {
+              id: node.id || node.pk || `reel_${i}`,
+              shortcode: node.code || node.shortcode || `reel_${i}`,
+              display_url: node.image_versions2?.candidates?.[0]?.url || `https://picsum.photos/400/600?random=${i}`,
+              video_url: node.video_versions?.[0]?.url || null,
+              is_video: true,
+              likes_count: node.like_count || 0,
+              comments_count: node.comment_count || 0,
+              caption: node.caption?.text || '',
+              timestamp: node.taken_at || (Date.now() / 1000 - i * 86400),
+              play_count: node.play_count || 0,
+            };
+          });
+        }
+      } catch (e) { /* fall through */ }
+    }
+
+    await cache.set('reels', username, reelsData);
+    return reelsData;
   }
 
   async getPost(shortcode) {
