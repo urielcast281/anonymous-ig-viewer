@@ -24,10 +24,10 @@ router.get('/:username', async (req, res) => {
     const profile = await instagram.getProfile(username);
     
     if (!profile) {
-      return res.status(404).render('error', {
-        error: { status: 404, message: 'Profile not found' },
-        title: `@${username} - Profile Not Found`,
-        description: `The Instagram profile @${username} could not be found or is not accessible.`
+      return res.status(503).render('error', {
+        error: { status: 503, message: `We couldn't load @${username}'s profile right now. Our Instagram data service is temporarily unavailable. Please try again in a few minutes.` },
+        title: `@${username} - Temporarily Unavailable`,
+        description: `The Instagram profile @${username} is temporarily unavailable. Please try again later.`
       });
     }
 

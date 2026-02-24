@@ -160,10 +160,10 @@ class InstagramService {
       }
     }
 
-    // Fallback to mock
+    // No data available — return null (let route show error page)
     if (!profileData) {
-      console.log(`🎭 Using mock data for profile: ${username}`);
-      profileData = this.getMockProfileData(username);
+      console.log(`❌ No data available for profile: ${username} — all APIs failed`);
+      return null;
     }
 
     await cache.set('profile', username, profileData);
@@ -307,7 +307,7 @@ class InstagramService {
     } catch (e) { /* fall through */ }
 
     if (!results) {
-      results = this.getMockSearchData(query);
+      results = [];
     }
 
     await cache.set('search', query, results);

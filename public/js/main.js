@@ -61,6 +61,7 @@ document.querySelectorAll('.search-form, .search-form-large').forEach(form => {
     const input = form.querySelector('input[name="q"]');
     if (input) {
       let value = input.value.trim();
+      if (!value) { e.preventDefault(); input.focus(); return; }
       // Remove @ prefix if user added it
       value = value.replace(/^@/, '');
       // Remove Instagram URL prefix
@@ -71,6 +72,14 @@ document.querySelectorAll('.search-form, .search-form-large').forEach(form => {
       value = value.split('?')[0];
       input.value = value;
     }
+  });
+});
+
+// Make search buttons respond instantly on mobile (no 300ms delay)
+document.querySelectorAll('.search-btn, .search-btn-large').forEach(btn => {
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    btn.closest('form').requestSubmit();
   });
 });
 

@@ -8,15 +8,18 @@
                 
                 <!-- Main Search -->
                 <div class="hero-search">
-                    <form action="/search" method="GET" class="search-form-large">
+                    <form action="/search" method="GET" class="search-form-large" id="heroSearchForm">
                         <div class="search-input-group">
                             <span class="search-prefix">@</span>
                             <input type="text" 
                                    name="q" 
+                                   id="heroSearchInput"
                                    class="search-input-large" 
                                    placeholder="Enter Instagram username" 
                                    value="<%= searchQuery || '' %>"
-                                   required>
+                                   autocomplete="off"
+                                   autocapitalize="off"
+                                   spellcheck="false">
                             <button type="submit" class="search-btn-large">
                                 <span class="search-icon">🔍</span>
                                 <span class="search-text">View Profile</span>

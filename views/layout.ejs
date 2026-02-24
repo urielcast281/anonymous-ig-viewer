@@ -55,7 +55,7 @@
                 <% if (currentPath !== '/') { %>
                 <div class="nav-search">
                     <form action="/search" method="GET" class="search-form">
-                        <input type="text" name="q" class="search-input" placeholder="Search Instagram username..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" required>
+                        <input type="text" name="q" class="search-input" placeholder="Search Instagram username..." value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" autocomplete="off" autocapitalize="off">
                         <button type="submit" class="search-btn"><span class="search-icon">🔍</span></button>
                     </form>
                 </div>
