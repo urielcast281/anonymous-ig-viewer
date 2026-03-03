@@ -160,10 +160,11 @@ class InstagramService {
       }
     }
 
-    // No data available — return null (let route show error page)
+    // Absolute last resort: use mock data if ALL APIs failed
     if (!profileData) {
-      console.log(`❌ No data available for profile: ${username} — all APIs failed`);
-      return null;
+      console.log(`❌ All APIs failed for profile: ${username} — falling back to mock data`);
+      console.log(`🎭 SERVING MOCK DATA for @${username} (all API sources unavailable)`);
+      profileData = this.getMockProfileData(username);
     }
 
     await cache.set('profile', username, profileData);
@@ -219,9 +220,15 @@ class InstagramService {
       } catch (e) { /* fall through */ }
     }
 
-    // No active stories — return null (let routes handle fallback to posts)
+    // No active stories — return empty stories or mock data based on config
     if (!storiesData) {
-      storiesData = { user: { username, profile_pic_url: '/images/default-avatar.svg' }, stories: [] };
+      const config = require('../config');
+      if (config.USE_MOCK_DATA) {
+        console.log(`🎭 SERVING MOCK STORIES for @${username} (all API sources unavailable)`);
+        storiesData = this.getMockStoriesData(username);
+      } else {
+        storiesData = { user: { username, profile_pic_url: '/images/default-avatar.svg' }, stories: [] };
+      }
     }
 
     await cache.set('stories', username, storiesData);
@@ -262,6 +269,24 @@ class InstagramService {
           });
         }
       } catch (e) { /* fall through */ }
+    }
+
+    // If no reels data and mock is enabled, provide mock reels
+    const config = require('../config');
+    if (reelsData.length === 0 && config.USE_MOCK_DATA) {
+      console.log(`🎭 SERVING MOCK REELS for @${username} (no reels available)`);
+      reelsData = Array.from({ length: 6 }, (_, i) => ({
+        id: `reel_${username}_${i}`,
+        shortcode: `reel_${username}_${i}`,
+        display_url: `https://picsum.photos/seed/${username}reel${i}/400/600`,
+        video_url: null,
+        is_video: true,
+        likes_count: Math.floor(Math.random() * 50000),
+        comments_count: Math.floor(Math.random() * 2000),
+        caption: `Reel ${i + 1} by @${username} #reels #explore`,
+        timestamp: Date.now() / 1000 - i * 86400,
+        play_count: Math.floor(Math.random() * 100000),
+      }));
     }
 
     await cache.set('reels', username, reelsData);
@@ -306,8 +331,15 @@ class InstagramService {
       }
     } catch (e) { /* fall through */ }
 
+    // If no search results and mock is enabled, provide mock search results
     if (!results) {
-      results = [];
+      const config = require('../config');
+      if (config.USE_MOCK_DATA) {
+        console.log(`🎭 SERVING MOCK SEARCH RESULTS for "${query}" (search API unavailable)`);
+        results = this.getMockSearchData(query);
+      } else {
+        results = [];
+      }
     }
 
     await cache.set('search', query, results);

@@ -47,7 +47,7 @@ module.exports = {
   SEO: {
     SITE_NAME: process.env.SITE_NAME || 'iPeep - Anonymous Instagram Story & Profile Viewer',
     SITE_DESCRIPTION: 'View Instagram stories, profiles, and posts anonymously. No login required. Download Instagram content easily and safely.',
-    SITE_URL: process.env.SITE_URL || 'https://instaviewer.net',
+    SITE_URL: process.env.SITE_URL || 'https://ipeep.xyz',
     DEFAULT_IMAGE: '/images/og-default.jpg',
     TWITTER_HANDLE: process.env.TWITTER_HANDLE || '@instaviewer',
   },
