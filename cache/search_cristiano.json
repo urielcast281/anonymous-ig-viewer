@@ -1,0 +1,79 @@
+{
+  "timestamp": 1772555631466,
+  "type": "search",
+  "identifier": "cristiano",
+  "data": [
+    {
+      "id": "1000",
+      "username": "cristiano",
+      "full_name": "Cristiano",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano0&background=833AB4&color=fff&size=150",
+      "is_verified": true,
+      "is_private": false,
+      "followers_count": 106361
+    },
+    {
+      "id": "1001",
+      "username": "cristianoofficial",
+      "full_name": "Cristiano Official",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano1&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": false,
+      "followers_count": 684689
+    },
+    {
+      "id": "1002",
+      "username": "cristiano_real",
+      "full_name": "Cristiano Fan Page",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano2&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": false,
+      "followers_count": 408253
+    },
+    {
+      "id": "1003",
+      "username": "cristiano.page",
+      "full_name": "Cristiano Daily",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano3&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": true,
+      "followers_count": 813357
+    },
+    {
+      "id": "1004",
+      "username": "cristianofan",
+      "full_name": "Cristiano Clips",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano4&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": false,
+      "followers_count": 463277
+    },
+    {
+      "id": "1005",
+      "username": "cristiano_daily",
+      "full_name": "Cristiano HQ",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano5&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": false,
+      "followers_count": 30800
+    },
+    {
+      "id": "1006",
+      "username": "cristianohq",
+      "full_name": "Cristiano Updates",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano6&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": false,
+      "followers_count": 511167
+    },
+    {
+      "id": "1007",
+      "username": "cristianoclips",
+      "full_name": "Cristiano Best",
+      "profile_pic_url": "https://ui-avatars.com/api/?name=cristiano7&background=833AB4&color=fff&size=150",
+      "is_verified": false,
+      "is_private": false,
+      "followers_count": 590461
+    }
+  ]
+}
