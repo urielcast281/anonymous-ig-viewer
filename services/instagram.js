@@ -3,6 +3,9 @@ const UserAgent = require('user-agents');
 const config = require('../config');
 const cache = require('./cache');
 const igDirect = require('./instagram-direct');
+const InstagramWebSession = require('./instagram-web-session');
+
+const igWeb = new InstagramWebSession();
 
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 const RAPIDAPI_HOST = 'instagram120.p.rapidapi.com';
@@ -57,6 +60,47 @@ class InstagramService {
     if (cached) return cached;
 
     let profileData = null;
+
+    // Priority 0: Web Session API (burner browser cookies) — fastest & free
+    if (igWeb.isReady()) {
+      try {
+        console.log(`🌐 Trying web session API for: ${username}`);
+        const p = await igWeb.getProfile(username);
+        if (p) {
+          const posts = await igWeb.getPosts(username, 12).catch(() => []);
+          profileData = {
+            id: p.id,
+            username: p.username,
+            full_name: p.full_name || p.username,
+            biography: p.biography || '',
+            profile_pic_url: p.profile_pic_url || '/images/default-avatar.svg',
+            profile_pic_url_hd: p.profile_pic_url || '/images/default-avatar.svg',
+            followers_count: p.follower_count || 0,
+            following_count: p.following_count || 0,
+            posts_count: p.post_count || 0,
+            is_verified: p.is_verified || false,
+            is_private: p.is_private || false,
+            external_url: p.external_url || '',
+            recent_posts: posts.map((post, i) => ({
+              id: post.id || `post_${i}`,
+              shortcode: post.shortcode || `code_${i}`,
+              display_url: post.display_url || post.thumbnail || '',
+              thumbnail_url: post.thumbnail || post.display_url || '',
+              is_video: post.is_video || false,
+              likes_count: post.like_count || 0,
+              comments_count: post.comment_count || 0,
+              caption: post.caption || '',
+              timestamp: post.timestamp || (Date.now() / 1000 - i * 86400),
+            })),
+          };
+          console.log(`✅ Got real data for @${username} via web session`);
+          await cache.set('profile', username, profileData);
+          return profileData;
+        }
+      } catch (e) {
+        console.log(`Web session failed: ${e.message}`);
+      }
+    }
 
     // Priority 1: Direct Instagram API (burner accounts) — most reliable
     if (igDirect.isConfigured) {
@@ -176,6 +220,34 @@ class InstagramService {
     if (cached) return cached;
 
     let storiesData = null;
+
+    // Priority 0: Web Session
+    if (igWeb.isReady()) {
+      try {
+        const uid = userId || await igWeb.getUserId(username).catch(() => null);
+        if (uid) {
+          const stories = await igWeb.getStories(uid);
+          if (stories && stories.length > 0) {
+            storiesData = {
+              user: { username, profile_pic_url: '/images/default-avatar.svg' },
+              stories: stories.map((s, i) => ({
+                id: s.id || `story_${i}`,
+                display_url: s.image_url || '',
+                is_video: s.type === 'video',
+                video_url: s.video_url || null,
+                timestamp: s.timestamp || (Date.now() / 1000 - i * 3600),
+                expires_at: s.expiring_at || (Date.now() / 1000 + 86400),
+              })),
+            };
+            console.log(`✅ Got ${stories.length} stories for @${username} via web session`);
+            await cache.set('stories', username, storiesData);
+            return storiesData;
+          }
+        }
+      } catch (e) {
+        console.log(`Web session stories failed: ${e.message}`);
+      }
+    }
 
     // Priority 1: Direct API
     if (igDirect.isConfigured) {
@@ -307,29 +379,53 @@ class InstagramService {
     const cached = await cache.get('search', query);
     if (cached) return cached;
 
-    // No search endpoint on this API — try direct Instagram search
     let results = null;
-    try {
-      const resp = await axios.get('https://www.instagram.com/web/search/topsearch/', {
-        params: { context: 'blended', query, rank_token: Math.random().toString(36).slice(2) },
-        headers: {
-          'User-Agent': this.userAgent.toString(),
-          'Accept': 'application/json',
-        },
-        timeout: 10000,
-      });
-      if (resp.data && resp.data.users) {
-        results = resp.data.users.map(u => ({
-          id: u.user.pk || u.user.id,
-          username: u.user.username,
-          full_name: u.user.full_name || u.user.username,
-          profile_pic_url: u.user.profile_pic_url || '/images/default-avatar.svg',
-          is_verified: u.user.is_verified || false,
-          is_private: u.user.is_private || false,
-          followers_count: u.user.follower_count || 0,
-        }));
+
+    // Priority 0: Web Session search
+    if (igWeb.isReady()) {
+      try {
+        const webResults = await igWeb.search(query);
+        if (webResults && webResults.length > 0) {
+          results = webResults.map(u => ({
+            id: u.username,
+            username: u.username,
+            full_name: u.full_name || u.username,
+            profile_pic_url: u.profile_pic_url || '/images/default-avatar.svg',
+            is_verified: u.is_verified || false,
+            is_private: u.is_private || false,
+            followers_count: u.follower_count || 0,
+          }));
+          console.log(`✅ Search "${query}" via web session: ${results.length} results`);
+        }
+      } catch (e) {
+        console.log(`Web session search failed: ${e.message}`);
       }
-    } catch (e) { /* fall through */ }
+    }
+
+    // Fallback: direct Instagram search (no auth)
+    if (!results) {
+      try {
+        const resp = await axios.get('https://www.instagram.com/web/search/topsearch/', {
+          params: { context: 'blended', query, rank_token: Math.random().toString(36).slice(2) },
+          headers: {
+            'User-Agent': this.userAgent.toString(),
+            'Accept': 'application/json',
+          },
+          timeout: 10000,
+        });
+        if (resp.data && resp.data.users) {
+          results = resp.data.users.map(u => ({
+            id: u.user.pk || u.user.id,
+            username: u.user.username,
+            full_name: u.user.full_name || u.user.username,
+            profile_pic_url: u.user.profile_pic_url || '/images/default-avatar.svg',
+            is_verified: u.user.is_verified || false,
+            is_private: u.user.is_private || false,
+            followers_count: u.user.follower_count || 0,
+          }));
+        }
+      } catch (e) { /* fall through */ }
+    }
 
     // If no search results and mock is enabled, provide mock search results
     if (!results) {
