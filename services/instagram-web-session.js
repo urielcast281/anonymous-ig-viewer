@@ -20,6 +20,13 @@ class InstagramWebSession {
   }
 
   _loadCookies() {
+    // Priority 1: Environment variable (for Render/production)
+    if (process.env.IG_WEB_COOKIES) {
+      try {
+        return JSON.parse(process.env.IG_WEB_COOKIES);
+      } catch {}
+    }
+    // Priority 2: File (for local dev)
     try {
       if (fs.existsSync(SESSION_FILE)) {
         return JSON.parse(fs.readFileSync(SESSION_FILE, 'utf8'));
