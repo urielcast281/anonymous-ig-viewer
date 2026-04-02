@@ -53,19 +53,22 @@ class InstagramWebSession {
       .join('; ');
   }
 
-  _request(urlPath, timeout = 15000) {
+  _request(urlPath, timeout = 15000, retries = 1) {
     return new Promise((resolve, reject) => {
       const req = https.get(`https://www.instagram.com${urlPath}`, {
         headers: {
           'User-Agent': UA,
           'Accept': '*/*',
           'Accept-Language': 'en-US,en;q=0.9',
-          'Cookie': this._buildCookieString(),
+          'Cookie': this._buildCookieString() + '; ig_nrcb=1',
           'X-IG-App-ID': IG_APP_ID,
           'X-CSRFToken': this.cookies?.csrftoken || '',
           'X-Requested-With': 'XMLHttpRequest',
           'Referer': 'https://www.instagram.com/',
           'Origin': 'https://www.instagram.com',
+          'Sec-Fetch-Dest': 'empty',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Site': 'same-origin',
         },
         timeout
       }, res => {
@@ -74,6 +77,12 @@ class InstagramWebSession {
         res.on('end', () => {
           if (res.statusCode === 401 || res.statusCode === 403) {
             return reject(new Error('Session expired — need to re-login'));
+          }
+          if (res.statusCode === 429 && retries > 0) {
+            console.log('⏳ IG rate limited, retrying in 2s...');
+            return setTimeout(() => {
+              this._request(urlPath, timeout, retries - 1).then(resolve).catch(reject);
+            }, 2000);
           }
           if (res.statusCode >= 400) {
             return reject(new Error(`HTTP ${res.statusCode}: ${data.slice(0, 200)}`));

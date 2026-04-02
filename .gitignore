@@ -4,3 +4,8 @@ node_modules/
 data/
 *.log
 .DS_Store
+.ig-sessions/
+extract-session.js  
+test-*.js  
+do-commit.bat  
+run-local.js  
