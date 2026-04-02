@@ -123,6 +123,7 @@ class InstagramWebSession {
   }
 
   async getPosts(username, count = 12) {
+    // Same endpoint as getProfile — reuse if possible
     const data = await this._request(`/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`);
     if (data.status !== 'ok' || !data.data?.user) throw new Error('Profile not found');
     
@@ -144,6 +145,49 @@ class InstagramWebSession {
         accessibility_caption: n.accessibility_caption,
       };
     });
+  }
+
+  // Combined profile + posts in a single API call (avoids double requests)
+  async getProfileWithPosts(username, postCount = 12) {
+    const data = await this._request(`/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`);
+    if (data.status !== 'ok' || !data.data?.user) throw new Error('Profile not found');
+    
+    const u = data.data.user;
+    const edges = u.edge_owner_to_timeline_media?.edges || [];
+    
+    return {
+      profile: {
+        id: u.id,
+        username: u.username,
+        full_name: u.full_name,
+        biography: u.biography,
+        profile_pic_url: u.profile_pic_url_hd || u.profile_pic_url,
+        follower_count: u.edge_followed_by?.count || 0,
+        following_count: u.edge_follow?.count || 0,
+        post_count: u.edge_owner_to_timeline_media?.count || 0,
+        is_private: u.is_private,
+        is_verified: u.is_verified,
+        external_url: u.external_url,
+        category: u.category_name,
+      },
+      posts: edges.slice(0, postCount).map(e => {
+        const n = e.node;
+        return {
+          id: n.id,
+          shortcode: n.shortcode,
+          type: n.__typename,
+          display_url: n.display_url,
+          thumbnail: n.thumbnail_src,
+          caption: n.edge_media_to_caption?.edges?.[0]?.node?.text || '',
+          like_count: n.edge_liked_by?.count || 0,
+          comment_count: n.edge_media_to_comment?.count || 0,
+          timestamp: n.taken_at_timestamp,
+          is_video: n.is_video,
+          video_url: n.video_url || null,
+          accessibility_caption: n.accessibility_caption,
+        };
+      }),
+    };
   }
 
   async getStories(userId) {

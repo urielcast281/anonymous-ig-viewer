@@ -65,9 +65,8 @@ class InstagramService {
     if (igWeb.isReady()) {
       try {
         console.log(`🌐 Trying web session API for: ${username}`);
-        const p = await igWeb.getProfile(username);
+        const { profile: p, posts } = await igWeb.getProfileWithPosts(username, 12);
         if (p) {
-          const posts = await igWeb.getPosts(username, 12).catch(() => []);
           profileData = {
             id: p.id,
             username: p.username,

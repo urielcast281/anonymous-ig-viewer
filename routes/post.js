@@ -53,21 +53,17 @@ router.get('/:shortcode', async (req, res) => {
       }
     }
 
-    // Get trending profiles for sidebar
-    const trendingProfiles = await Promise.allSettled(
-      config.TRENDING_PROFILES.slice(0, 4).map(async username => {
-        try {
-          const profile = await instagram.getProfile(username);
-          return { username, profile, success: true };
-        } catch (error) {
-          return { username, profile: null, success: false };
-        }
-      })
-    );
-
-    const successfulTrending = trendingProfiles
-      .filter(result => result.status === 'fulfilled' && result.value.success)
-      .map(result => result.value);
+    // Trending profiles — static to avoid burning API calls
+    const successfulTrending = config.TRENDING_PROFILES.slice(0, 4).map(u => ({
+      username: u,
+      profile: {
+        username: u,
+        full_name: u.charAt(0).toUpperCase() + u.slice(1),
+        profile_pic_url: `https://ui-avatars.com/api/?name=${u}&background=E1306C&color=fff&size=150`,
+        is_verified: true,
+      },
+      success: true,
+    }));
 
     res.render('post', {
       metaData,

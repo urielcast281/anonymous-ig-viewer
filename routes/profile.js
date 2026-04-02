@@ -43,25 +43,21 @@ router.get('/:username', async (req, res) => {
       console.log(`📸 Stories not available for ${username}: ${error.message}`);
     }
 
-    // Related/suggested profiles (trending profiles as fallback)
-    const relatedProfiles = await Promise.allSettled(
-      config.TRENDING_PROFILES
-        .filter(u => u !== username)
-        .slice(0, 6)
-        .map(async relatedUsername => {
-          try {
-            const relatedProfile = await instagram.getProfile(relatedUsername);
-            return { username: relatedUsername, profile: relatedProfile, success: true };
-          } catch (error) {
-            return { username: relatedUsername, profile: null, success: false };
-          }
-        })
-    );
-
-    const successfulRelated = relatedProfiles
-      .filter(result => result.status === 'fulfilled' && result.value.success)
-      .map(result => result.value)
-      .slice(0, 4);
+    // Related/suggested profiles — static to avoid burning API calls
+    const successfulRelated = config.TRENDING_PROFILES
+      .filter(u => u !== username)
+      .slice(0, 4)
+      .map(u => ({
+        username: u,
+        profile: {
+          username: u,
+          full_name: u.charAt(0).toUpperCase() + u.slice(1),
+          profile_pic_url: `https://ui-avatars.com/api/?name=${u}&background=E1306C&color=fff&size=150`,
+          is_verified: true,
+          followers_count: 0,
+        },
+        success: true,
+      }));
 
     res.render('profile', {
       metaData,
