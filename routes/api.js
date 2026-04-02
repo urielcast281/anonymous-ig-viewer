@@ -396,11 +396,19 @@ router.get('/debug-api', async (req, res) => {
   const username = req.query.u || 'instagram';
   const key = process.env.RAPIDAPI_KEY;
   const igDirect = require('../services/instagram-direct');
+  const InstagramWebSession = require('../services/instagram-web-session');
+  const igWeb = new InstagramWebSession();
   const result = { 
     hasKey: !!key, 
     keyPrefix: key ? key.substring(0, 8) + '...' : 'MISSING',
     useMock: process.env.USE_MOCK_DATA,
     directApi: { configured: igDirect.isConfigured, accounts: igDirect.accountCount },
+    webSession: { 
+      ready: igWeb.isReady(), 
+      hasEnvVar: !!process.env.IG_WEB_COOKIES,
+      envVarLen: (process.env.IG_WEB_COOKIES || '').length,
+      cookieKeys: igWeb.cookies ? Object.keys(igWeb.cookies) : null,
+    },
   };
   
   try {
