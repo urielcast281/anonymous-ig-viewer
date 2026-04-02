@@ -9,18 +9,19 @@ let trendingCache = { data: null, ts: 0 };
 const TRENDING_CACHE_MS = 6 * 60 * 60 * 1000;
 
 async function getTrendingProfiles() {
-  if (trendingCache.data && Date.now() - trendingCache.ts < TRENDING_CACHE_MS) {
-    return trendingCache.data;
-  }
+  // Return static trending list — no API calls on homepage to avoid rate limits
   const usernames = config.TRENDING_PROFILES.slice(0, 8);
-  const results = await Promise.allSettled(
-    usernames.map(u => instagram.getProfile(u).then(p => ({ username: u, profile: p || null, success: !!p })))
-  );
-  const profiles = results.map((r, i) => 
-    r.status === 'fulfilled' && r.value.profile ? r.value : { username: usernames[i], profile: null, success: false }
-  );
-  trendingCache = { data: profiles, ts: Date.now() };
-  return profiles;
+  return usernames.map(u => ({
+    username: u,
+    profile: {
+      username: u,
+      full_name: u.charAt(0).toUpperCase() + u.slice(1),
+      profile_pic_url: `https://ui-avatars.com/api/?name=${u}&background=E1306C&color=fff&size=150`,
+      is_verified: true,
+      followers_count: 0,
+    },
+    success: true,
+  }));
 }
 
 // Homepage
