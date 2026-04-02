@@ -97,7 +97,23 @@ class InstagramWebSession {
   }
 
   async getProfile(username) {
-    const data = await this._request(`/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`);
+    // Try web_profile_info API first
+    let data;
+    try {
+      data = await this._request(`/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`, 15000, 0);
+    } catch (e) {
+      if (e.message.includes('429')) {
+        // API rate limited — try HTML scrape (different rate limit)
+        console.log(`⏳ API 429'd, trying HTML scrape for @${username}...`);
+        try {
+          const scraped = await this._scrapeProfile(username);
+          if (scraped) return scraped;
+        } catch (scrapeErr) {
+          console.log(`HTML scrape failed: ${scrapeErr.message}`);
+        }
+      }
+      throw e;
+    }
     if (data.status !== 'ok' || !data.data?.user) throw new Error('Profile not found');
     
     const u = data.data.user;
@@ -149,7 +165,21 @@ class InstagramWebSession {
 
   // Combined profile + posts in a single API call (avoids double requests)
   async getProfileWithPosts(username, postCount = 12) {
-    const data = await this._request(`/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`);
+    let data;
+    try {
+      data = await this._request(`/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`, 15000, 0);
+    } catch (e) {
+      if (e.message.includes('429')) {
+        console.log(`⏳ API 429'd, trying HTML scrape for @${username}...`);
+        try {
+          const scraped = await this._scrapeProfile(username);
+          if (scraped) return { profile: scraped, posts: [] };
+        } catch (scrapeErr) {
+          console.log(`HTML scrape failed: ${scrapeErr.message}`);
+        }
+      }
+      throw e;
+    }
     if (data.status !== 'ok' || !data.data?.user) throw new Error('Profile not found');
     
     const u = data.data.user;
@@ -204,6 +234,110 @@ class InstagramWebSession {
       timestamp: item.taken_at,
       expiring_at: item.expiring_at,
     }));
+  }
+
+  // Scrape public profile page HTML — different rate limit than API endpoints
+  async _scrapeProfile(username) {
+    return new Promise((resolve, reject) => {
+      const req = https.get(`https://www.instagram.com/${encodeURIComponent(username)}/`, {
+        headers: {
+          'User-Agent': UA,
+          'Accept': 'text/html,application/xhtml+xml',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cookie': this._buildCookieString() + '; ig_nrcb=1',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+        },
+        timeout: 15000
+      }, res => {
+        if (res.statusCode === 302 || res.statusCode === 301) {
+          return reject(new Error('Redirect — login required'));
+        }
+        if (res.statusCode >= 400) {
+          return reject(new Error(`HTTP ${res.statusCode}`));
+        }
+        let html = '';
+        res.on('data', c => html += c);
+        res.on('end', () => {
+          try {
+            // Try to extract JSON from script tags
+            // Method 1: window._sharedData
+            let match = html.match(/window\._sharedData\s*=\s*(\{.+?\});<\/script>/s);
+            if (match) {
+              const shared = JSON.parse(match[1]);
+              const u = shared?.entry_data?.ProfilePage?.[0]?.graphql?.user;
+              if (u) return resolve(this._parseGraphqlUser(u));
+            }
+            // Method 2: __NEXT_DATA__ (newer IG)
+            match = html.match(/<script[^>]*id="__NEXT_DATA__"[^>]*>(\{.+?\})<\/script>/s);
+            if (match) {
+              const next = JSON.parse(match[1]);
+              // Navigate the Next.js data structure
+              const userData = this._findUserInNextData(next);
+              if (userData) return resolve(userData);
+            }
+            // Method 3: look for xdt_api__v1__users__web_profile_info in any script
+            match = html.match(/"xdt_api__v1__users__web_profile_info":\s*(\{.+?\})\s*[,}]/s);
+            if (match) {
+              const info = JSON.parse(match[1]);
+              const u = info?.user;
+              if (u) return resolve(this._parseGraphqlUser(u));
+            }
+            reject(new Error('Could not parse profile from HTML'));
+          } catch (e) {
+            reject(new Error('HTML parse failed: ' + e.message));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    });
+  }
+
+  _parseGraphqlUser(u) {
+    return {
+      id: u.id,
+      username: u.username,
+      full_name: u.full_name,
+      biography: u.biography,
+      profile_pic_url: u.profile_pic_url_hd || u.profile_pic_url,
+      follower_count: u.edge_followed_by?.count || 0,
+      following_count: u.edge_follow?.count || 0,
+      post_count: u.edge_owner_to_timeline_media?.count || 0,
+      is_private: u.is_private,
+      is_verified: u.is_verified,
+      external_url: u.external_url,
+      category: u.category_name,
+    };
+  }
+
+  _findUserInNextData(data) {
+    // Recursively search for user object in Next.js data
+    const str = JSON.stringify(data);
+    const match = str.match(/"username":"[^"]+","full_name":"[^"]*"/);
+    if (!match) return null;
+    // Find the containing user object
+    try {
+      const userMatch = str.match(/\{"id":"(\d+)","username":"([^"]+)","full_name":"([^"]*)"/);
+      if (userMatch) {
+        // Extract what we can from the string
+        return {
+          id: userMatch[1],
+          username: userMatch[2],
+          full_name: userMatch[3],
+          biography: '',
+          profile_pic_url: '',
+          follower_count: 0,
+          following_count: 0,
+          post_count: 0,
+          is_private: false,
+          is_verified: false,
+          external_url: '',
+        };
+      }
+    } catch {}
+    return null;
   }
 
   async search(query) {
