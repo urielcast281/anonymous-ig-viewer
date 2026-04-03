@@ -317,7 +317,11 @@ function renderFullscreen(index) {
  const dlBtn = document.getElementById('fullscreenDownload');
  
  if (story.is_video && story.video_url) {
- mediaDiv.innerHTML = `<video autoplay loop muted playsinline onclick="this.paused ? this.play() : this.pause(); this.muted = false;" src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}"></video>`;
+ mediaDiv.innerHTML = `<video autoplay playsinline src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}" onclick="this.paused ? this.play() : this.pause();"></video>`;
+ // Try unmuted autoplay first, fall back to muted
+ const vid = mediaDiv.querySelector('video');
+ vid.muted = false;
+ vid.play().catch(() => { vid.muted = true; vid.play(); });
  dlBtn.href = `/api/img?url=${encodeURIComponent(story.video_url)}`;
  dlBtn.download = `${storyUsername}_story_${index + 1}.mp4`;
  } else {
