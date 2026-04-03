@@ -28,8 +28,8 @@ router.get('/:username', async (req, res) => {
       console.log(`Profile unavailable for ${username}, continuing with stories only`);
     }
 
-    // Try to get stories
-    let stories = await instagram.getStories(username);
+    // Try to get stories — pass userId if we have it (avoids extra API call)
+    let stories = await instagram.getStories(username, profile?.id);
 
     if (!stories || !stories.stories || stories.stories.length === 0) {
       // Generate SEO meta data for no stories page

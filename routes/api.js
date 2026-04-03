@@ -375,7 +375,8 @@ router.get('/img', async (req, res) => {
       }
     }, (proxyRes) => {
       if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
-        return res.redirect(proxyRes.headers.location);
+        if (!res.headersSent) return res.redirect(proxyRes.headers.location);
+        return;
       }
       // Override the JSON content-type from middleware
       res.removeHeader('Content-Type');
@@ -384,8 +385,8 @@ router.get('/img', async (req, res) => {
       res.set('Cross-Origin-Resource-Policy', 'cross-origin');
       proxyRes.pipe(res);
     });
-    proxyReq.on('error', () => res.status(502).send('Proxy error'));
-    proxyReq.setTimeout(15000, () => { proxyReq.destroy(); res.status(504).send('Timeout'); });
+    proxyReq.on('error', () => { if (!res.headersSent) res.status(502).send('Proxy error'); });
+    proxyReq.setTimeout(15000, () => { proxyReq.destroy(); if (!res.headersSent) res.status(504).send('Timeout'); });
   } catch (e) {
     res.status(500).send('Error');
   }
