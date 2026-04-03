@@ -38,9 +38,17 @@ router.get('/:username', async (req, res) => {
     // Try to get stories data (might fail if requires auth)
     let stories = null;
     try {
-      stories = await instagram.getStories(username);
+      stories = await instagram.getStories(username, profile.id);
     } catch (error) {
       console.log(`📸 Stories not available for ${username}: ${error.message}`);
+    }
+
+    // Try to get highlights
+    let highlights = [];
+    try {
+      highlights = await instagram.getHighlights(username, profile.id);
+    } catch (error) {
+      console.log(`📸 Highlights not available for ${username}: ${error.message}`);
     }
 
     // Related/suggested profiles — static to avoid burning API calls
@@ -64,6 +72,7 @@ router.get('/:username', async (req, res) => {
       structuredData,
       profile,
       stories,
+      highlights,
       relatedProfiles: successfulRelated,
       username,
       pageTitle: `@${username} - ${profile.full_name || username}`

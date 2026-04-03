@@ -380,6 +380,23 @@ class InstagramService {
     const cached = await cache.get('reels', username);
     if (cached) return cached;
 
+    // Priority -1: Mobile API reels
+    if (igMobile.isConfigured) {
+      try {
+        const uid = userId || (await igMobile.getProfile(username).catch(() => null))?.id;
+        if (uid) {
+          const reels = await igMobile.getReels(uid, 12);
+          if (reels && reels.length > 0) {
+            console.log(`✅ Got ${reels.length} reels for @${username} via mobile API`);
+            await cache.set('reels', username, reels);
+            return reels;
+          }
+        }
+      } catch (e) {
+        console.log(`Mobile API reels failed: ${e.message}`);
+      }
+    }
+
     if (!userId) {
       try {
         const profileResp = await this.apiCall('profile', { username });
@@ -431,6 +448,33 @@ class InstagramService {
 
     await cache.set('reels', username, reelsData);
     return reelsData;
+  }
+
+  async getHighlights(username, userId) {
+    const cached = await cache.get('highlights', username);
+    if (cached) return cached;
+
+    let highlights = [];
+
+    // Mobile API highlights
+    if (igMobile.isConfigured) {
+      try {
+        const uid = userId || (await igMobile.getProfile(username).catch(() => null))?.id;
+        if (uid) {
+          highlights = await igMobile.getHighlights(uid);
+          if (highlights && highlights.length > 0) {
+            console.log(`✅ Got ${highlights.length} highlights for @${username} via mobile API`);
+            await cache.set('highlights', username, highlights);
+            return highlights;
+          }
+        }
+      } catch (e) {
+        console.log(`Mobile API highlights failed: ${e.message}`);
+      }
+    }
+
+    await cache.set('highlights', username, highlights);
+    return highlights;
   }
 
   async getPost(shortcode) {
