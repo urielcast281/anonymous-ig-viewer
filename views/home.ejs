@@ -1,336 +1,336 @@
 <div class="home-container">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">View Instagram Without Logging In</h1>
-                <p class="hero-subtitle">Look at someone's Instagram without an account. See their stories, posts, and profile without signing up or downloading anything. Free, private, and anonymous.</p>
-                
-                <!-- Main Search -->
-                <div class="hero-search">
-                    <form action="/search" method="GET" class="search-form-large" id="heroSearchForm">
-                        <div class="search-input-group">
-                            <span class="search-prefix">@</span>
-                            <input type="text" 
-                                   name="q" 
-                                   id="heroSearchInput"
-                                   class="search-input-large" 
-                                   placeholder="Enter Instagram username" 
-                                   value="<%= searchQuery || '' %>"
-                                   autocomplete="off"
-                                   autocapitalize="off"
-                                   spellcheck="false">
-                            <button type="submit" class="search-btn-large">
-                                <span class="search-icon">🔍</span>
-                                <span class="search-text">View Profile</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Feature Pills -->
-                <div class="feature-pills">
-                    <span class="pill">🚫 No Account Needed</span>
-                    <span class="pill">🔑 No Login</span>
-                    <span class="pill">👁️ They Won't Know</span>
-                    <span class="pill">📥 Save Stories</span>
-                    <span class="pill">🆓 100% Free</span>
-                </div>
-            </div>
-        </div>
-    </div>
+ <!-- Hero Section -->
+ <div class="hero-section">
+ <div class="container">
+ <div class="hero-content">
+ <h1 class="hero-title">View Instagram Without Logging In</h1>
+ <p class="hero-subtitle">Look at someone's Instagram without an account. See their stories, posts, and profile without signing up or downloading anything. Free, private, and anonymous.</p>
+ 
+ <!-- Main Search -->
+ <div class="hero-search">
+ <form action="/search" method="GET" class="search-form-large" id="heroSearchForm">
+ <div class="search-input-group">
+ <span class="search-prefix">@</span>
+ <input type="text" 
+ name="q" 
+ id="heroSearchInput"
+ class="search-input-large" 
+ placeholder="Enter Instagram username" 
+ value="<%= searchQuery || '' %>"
+ autocomplete="off"
+ autocapitalize="off"
+ spellcheck="false">
+ <button type="submit" class="search-btn-large">
+ <span class="search-icon"></span>
+ <span class="search-text">View Profile</span>
+ </button>
+ </div>
+ </form>
+ </div>
+ 
+ <!-- Feature Pills -->
+ <div class="feature-pills">
+ <span class="pill"> No Account Needed</span>
+ <span class="pill"> No Login</span>
+ <span class="pill"> They Won't Know</span>
+ <span class="pill"> Save Stories</span>
+ <span class="pill">🆓 100% Free</span>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <!-- Search Results (if any) -->
-    <% if (typeof searchResults !== 'undefined' && searchResults) { %>
-    <div class="search-results-section">
-        <div class="container">
-            <div class="results-header">
-                <h2>Search Results for "<%= searchQuery %>"</h2>
-                <p class="results-count"><%= searchResults.length %> users found</p>
-            </div>
-            
-            <!-- Native Ad in Search Results -->
-            <% if (config.ADS.ENABLE_ADS && searchResults.length > 3) { %>
-            <div class="ad-slot ad-native-search" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_NATIVE %>">
-                <div class="ad-label">Advertisement</div>
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-format="fluid"
-                     data-ad-layout-key="-6t+ed+2i-1n-4w"
-                     data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
-                     data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_NATIVE %>"></ins>
-            </div>
-            <% } %>
-            
-            <div class="search-results-grid">
-                <% searchResults.forEach((result, index) => { %>
-                <div class="user-card">
-                    <a href="/profile/<%= result.username %>" class="user-link">
-                        <div class="user-avatar">
-                            <img src="<%= result.profile_pic_url || '/images/default-avatar.jpg' %>" 
-                                 alt="<%= result.username %>" 
-                                 loading="lazy">
-                            <% if (result.is_verified) { %>
-                            <span class="verified-badge">✓</span>
-                            <% } %>
-                        </div>
-                        <div class="user-info">
-                            <h3 class="user-username">@<%= result.username %></h3>
-                            <p class="user-fullname"><%= result.full_name %></p>
-                            <div class="user-stats">
-                                <% if (result.followers_count) { %>
-                                <span class="stat">
-                                    <%= seo.formatCount(result.followers_count) %> followers
-                                </span>
-                                <% } %>
-                                <% if (result.is_private) { %>
-                                <span class="privacy-badge">🔒 Private</span>
-                                <% } %>
-                            </div>
-                        </div>
-                    </a>
-                    <div class="user-actions">
-                        <a href="/profile/<%= result.username %>" class="btn btn-primary">View Profile</a>
-                        <a href="/stories/<%= result.username %>" class="btn btn-secondary">Stories</a>
-                    </div>
-                </div>
-                
-                <!-- In-feed Ad every 4 results -->
-                <% if (config.ADS.ENABLE_ADS && (index + 1) % 4 === 0 && index < searchResults.length - 1) { %>
-                <div class="ad-slot ad-infeed" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
-                    <div class="ad-label">Advertisement</div>
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-format="fluid"
-                         data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
-                         data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
-                </div>
-                <% } %>
-                <% }) %>
-            </div>
-        </div>
-    </div>
-    <% } else if (typeof searchError !== 'undefined' && searchError) { %>
-    <!-- Search Error -->
-    <div class="search-error-section">
-        <div class="container">
-            <div class="error-message">
-                <h2>Search Temporarily Unavailable</h2>
-                <p><%= searchError %></p>
-                <a href="/" class="btn btn-primary">Try Again</a>
-            </div>
-        </div>
-    </div>
-    <% } %>
+ <!-- Search Results (if any) -->
+ <% if (typeof searchResults !== 'undefined' && searchResults) { %>
+ <div class="search-results-section">
+ <div class="container">
+ <div class="results-header">
+ <h2>Search Results for "<%= searchQuery %>"</h2>
+ <p class="results-count"><%= searchResults.length %> users found</p>
+ </div>
+ 
+ <!-- Native Ad in Search Results -->
+ <% if (config.ADS.ENABLE_ADS && searchResults.length > 3) { %>
+ <div class="ad-slot ad-native-search" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_NATIVE %>">
+ <div class="ad-label">Advertisement</div>
+ <ins class="adsbygoogle"
+ style="display:block"
+ data-ad-format="fluid"
+ data-ad-layout-key="-6t+ed+2i-1n-4w"
+ data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+ data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_NATIVE %>"></ins>
+ </div>
+ <% } %>
+ 
+ <div class="search-results-grid">
+ <% searchResults.forEach((result, index) => { %>
+ <div class="user-card">
+ <a href="/profile/<%= result.username %>" class="user-link">
+ <div class="user-avatar">
+ <img src="<%= result.profile_pic_url || '/images/default-avatar.jpg' %>" 
+ alt="<%= result.username %>" 
+ loading="lazy">
+ <% if (result.is_verified) { %>
+ <span class="verified-badge"></span>
+ <% } %>
+ </div>
+ <div class="user-info">
+ <h3 class="user-username">@<%= result.username %></h3>
+ <p class="user-fullname"><%= result.full_name %></p>
+ <div class="user-stats">
+ <% if (result.followers_count) { %>
+ <span class="stat">
+ <%= seo.formatCount(result.followers_count) %> followers
+ </span>
+ <% } %>
+ <% if (result.is_private) { %>
+ <span class="privacy-badge"> Private</span>
+ <% } %>
+ </div>
+ </div>
+ </a>
+ <div class="user-actions">
+ <a href="/profile/<%= result.username %>" class="btn btn-primary">View Profile</a>
+ <a href="/stories/<%= result.username %>" class="btn btn-secondary">Stories</a>
+ </div>
+ </div>
+ 
+ <!-- In-feed Ad every 4 results -->
+ <% if (config.ADS.ENABLE_ADS && (index + 1) % 4 === 0 && index < searchResults.length - 1) { %>
+ <div class="ad-slot ad-infeed" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
+ <div class="ad-label">Advertisement</div>
+ <ins class="adsbygoogle"
+ style="display:block"
+ data-ad-format="fluid"
+ data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
+ data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
+ </div>
+ <% } %>
+ <% }) %>
+ </div>
+ </div>
+ </div>
+ <% } else if (typeof searchError !== 'undefined' && searchError) { %>
+ <!-- Search Error -->
+ <div class="search-error-section">
+ <div class="container">
+ <div class="error-message">
+ <h2>Search Temporarily Unavailable</h2>
+ <p><%= searchError %></p>
+ <a href="/" class="btn btn-primary">Try Again</a>
+ </div>
+ </div>
+ </div>
+ <% } %>
 
-    <!-- Trending Profiles -->
-    <!-- Quick Tools Section -->
-    <div class="trending-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">📸 What Can You Do?</h2>
-                <p class="section-subtitle">Browse Instagram anonymously — no account needed</p>
-            </div>
+ <!-- Trending Profiles -->
+ <!-- Quick Tools Section -->
+ <div class="trending-section">
+ <div class="container">
+ <div class="section-header">
+ <h2 class="section-title"> What Can You Do?</h2>
+ <p class="section-subtitle">Browse Instagram anonymously — no account needed</p>
+ </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:30px;">
-                <a href="/instagram-story-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#833AB4,#E1306C);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
-                    <div style="font-size:40px;margin-bottom:12px;">👁️</div>
-                    <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">View Stories Anonymously</h3>
-                    <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">Watch anyone's stories without them knowing. No login required.</p>
-                </a>
-                <a href="/anonymous-instagram-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#405DE6,#5851DB);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
-                    <div style="font-size:40px;margin-bottom:12px;">👤</div>
-                    <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">Browse Profiles</h3>
-                    <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">See posts, followers, and bio without an account or signing up.</p>
-                </a>
-                <a href="/instagram-story-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#F77737,#FCAF45);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
-                    <div style="font-size:40px;margin-bottom:12px;">📥</div>
-                    <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">Download Stories & Reels</h3>
-                    <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">Save stories, reels, and posts to your phone. Free, no app needed.</p>
-                </a>
-            </div>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:30px;">
+ <a href="/instagram-story-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#833AB4,#E1306C);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
+ <div style="font-size:40px;margin-bottom:12px;"></div>
+ <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">View Stories Anonymously</h3>
+ <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">Watch anyone's stories without them knowing. No login required.</p>
+ </a>
+ <a href="/anonymous-instagram-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#405DE6,#5851DB);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
+ <div style="font-size:40px;margin-bottom:12px;"></div>
+ <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">Browse Profiles</h3>
+ <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">See posts, followers, and bio without an account or signing up.</p>
+ </a>
+ <a href="/instagram-story-viewer" style="display:block;text-decoration:none;background:linear-gradient(135deg,#F77737,#FCAF45);border-radius:16px;padding:28px 24px;text-align:center;transition:transform 0.2s;">
+ <div style="font-size:40px;margin-bottom:12px;"></div>
+ <h3 style="color:white;font-size:1.2rem;margin-bottom:6px;">Download Stories & Reels</h3>
+ <p style="color:rgba(255,255,255,0.8);font-size:0.9rem;">Save stories, reels, and posts to your phone. Free, no app needed.</p>
+ </a>
+ </div>
 
-            <!-- Ad slot -->
-            <div style="text-align:center;margin:24px 0;">
-                <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
-                <div id="container-7b466dd839b40ecfeb07def8c857f3b2"></div>
-            </div>
+ <!-- Ad slot -->
+ <div style="text-align:center;margin:24px 0;">
+ <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
+ <div id="container-7b466dd839b40ecfeb07def8c857f3b2"></div>
+ </div>
 
-            <!-- Quick search examples -->
-            <div style="text-align:center;margin-top:20px;">
-                <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Try searching for any public account:</p>
-                <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
-                    <a href="/search?q=instagram" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@instagram</a>
-                    <a href="/search?q=cristiano" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@cristiano</a>
-                    <a href="/search?q=selenagomez" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@selenagomez</a>
-                    <a href="/search?q=kyliejenner" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@kyliejenner</a>
-                    <a href="/search?q=therock" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@therock</a>
-                    <a href="/search?q=leomessi" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@leomessi</a>
-                </div>
-            </div>
-        </div>
-    </div>
+ <!-- Quick search examples -->
+ <div style="text-align:center;margin-top:20px;">
+ <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Try searching for any public account:</p>
+ <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+ <a href="/search?q=instagram" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@instagram</a>
+ <a href="/search?q=cristiano" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@cristiano</a>
+ <a href="/search?q=selenagomez" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@selenagomez</a>
+ <a href="/search?q=kyliejenner" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@kyliejenner</a>
+ <a href="/search?q=therock" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@therock</a>
+ <a href="/search?q=leomessi" style="background:#1a1a1a;color:#ddd;padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.85rem;border:1px solid #333;">@leomessi</a>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <!-- Features Section -->
-    <div class="features-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Why Choose iPeep?</h2>
-                <p class="section-subtitle">The best way to view Instagram content anonymously</p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">👁️</div>
-                    <h3>100% Anonymous</h3>
-                    <p>View stories and profiles without revealing your identity. No traces left behind.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🚫</div>
-                    <h3>No Login Required</h3>
-                    <p>Access Instagram content without creating an account or providing personal information.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📥</div>
-                    <h3>Download Content</h3>
-                    <p>Save stories, posts, and profile pictures in high quality directly to your device.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Lightning Fast</h3>
-                    <p>Optimized for speed with intelligent caching. Get results in seconds.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3>Mobile Friendly</h3>
-                    <p>Perfect experience on all devices - phone, tablet, or desktop computer.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Privacy Protected</h3>
-                    <p>We don't store your data or track your viewing history. Your privacy is guaranteed.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+ <!-- Features Section -->
+ <div class="features-section">
+ <div class="container">
+ <div class="section-header">
+ <h2 class="section-title">Why Choose iPeep?</h2>
+ <p class="section-subtitle">The best way to view Instagram content anonymously</p>
+ </div>
+ 
+ <div class="features-grid">
+ <div class="feature-card">
+ <div class="feature-icon"></div>
+ <h3>100% Anonymous</h3>
+ <p>View stories and profiles without revealing your identity. No traces left behind.</p>
+ </div>
+ 
+ <div class="feature-card">
+ <div class="feature-icon"></div>
+ <h3>No Login Required</h3>
+ <p>Access Instagram content without creating an account or providing personal information.</p>
+ </div>
+ 
+ <div class="feature-card">
+ <div class="feature-icon"></div>
+ <h3>Download Content</h3>
+ <p>Save stories, posts, and profile pictures in high quality directly to your device.</p>
+ </div>
+ 
+ <div class="feature-card">
+ <div class="feature-icon"></div>
+ <h3>Lightning Fast</h3>
+ <p>Optimized for speed with intelligent caching. Get results in seconds.</p>
+ </div>
+ 
+ <div class="feature-card">
+ <div class="feature-icon"></div>
+ <h3>Mobile Friendly</h3>
+ <p>Perfect experience on all devices - phone, tablet, or desktop computer.</p>
+ </div>
+ 
+ <div class="feature-card">
+ <div class="feature-icon"></div>
+ <h3>Privacy Protected</h3>
+ <p>We don't store your data or track your viewing history. Your privacy is guaranteed.</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <!-- How It Works -->
-    <div class="how-it-works-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">No account needed. No app to download. Just 3 steps.</p>
-            </div>
-            
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Enter Username</h3>
-                    <p>Type the Instagram username in the search box above</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Browse Content</h3>
-                    <p>View their profile, stories, and posts anonymously</p>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Download (Optional)</h3>
-                    <p>Save any content you like directly to your device</p>
-                </div>
-            </div>
-            
-            <div class="cta-section">
-                <a href="/about/how-it-works" class="btn btn-primary">Learn More</a>
-                <a href="/about" class="btn btn-outline">FAQ</a>
-            </div>
-        </div>
-    </div>
+ <!-- How It Works -->
+ <div class="how-it-works-section">
+ <div class="container">
+ <div class="section-header">
+ <h2 class="section-title">How It Works</h2>
+ <p class="section-subtitle">No account needed. No app to download. Just 3 steps.</p>
+ </div>
+ 
+ <div class="steps-grid">
+ <div class="step">
+ <div class="step-number">1</div>
+ <h3>Enter Username</h3>
+ <p>Type the Instagram username in the search box above</p>
+ </div>
+ 
+ <div class="step">
+ <div class="step-number">2</div>
+ <h3>Browse Content</h3>
+ <p>View their profile, stories, and posts anonymously</p>
+ </div>
+ 
+ <div class="step">
+ <div class="step-number">3</div>
+ <h3>Download (Optional)</h3>
+ <p>Save any content you like directly to your device</p>
+ </div>
+ </div>
+ 
+ <div class="cta-section">
+ <a href="/about/how-it-works" class="btn btn-primary">Learn More</a>
+ <a href="/about" class="btn btn-outline">FAQ</a>
+ </div>
+ </div>
+ </div>
 </div>
 
-    <!-- SEO Content Section -->
-    <div class="seo-section" style="padding:60px 0;background:#111;">
-        <div class="container">
-            <h2 style="text-align:center;color:white;font-size:1.8rem;margin-bottom:16px;">How to See Someone's Instagram Without an Account</h2>
-            <p style="text-align:center;color:#999;max-width:700px;margin:0 auto 40px;line-height:1.7;">Want to look at someone's Instagram but don't have an account? Don't want to sign up or log in? iPeep lets you check anyone's public posts, stories, and profile — no account needed, no app to download, nothing to install. Just type their name and go.</p>
-            <h3 style="text-align:center;color:#ccc;font-size:1.3rem;margin-bottom:16px;">Best Free Instagram Viewer — Picuki & StoriesIG Alternative</h3>
-            <p style="text-align:center;color:#999;max-width:700px;margin:0 auto 40px;line-height:1.7;">
-                iPeep is the #1 anonymous Instagram story viewer and downloader in 2026. View Instagram stories without an account, download IG reels, browse profiles privately — all for free. No login, no app, no trace.
-            </p>
-            
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:40px;">
-                <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
-                    <h3 style="color:white;margin-bottom:8px;">📸 Instagram Story Viewer</h3>
-                    <p style="color:#aaa;line-height:1.6;">Watch Instagram stories anonymously without an account. No login, no sign up needed. Our IG story viewer lets you view stories from any public account without logging in. Better than Picuki, StoriesIG, and Anonyig.</p>
-                </div>
-                <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
-                    <h3 style="color:white;margin-bottom:8px;">📥 Instagram Story Downloader</h3>
-                    <p style="color:#aaa;line-height:1.6;">Save Instagram stories before they disappear. Download IG stories, reels, posts, and profile pictures in HD quality. Free Instagram story saver — no app needed.</p>
-                </div>
-                <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
-                    <h3 style="color:white;margin-bottom:8px;">👤 Anonymous Profile Viewer</h3>
-                    <p style="color:#aaa;line-height:1.6;">Browse Instagram profiles without an account or login. No sign up required — see posts, followers, bio, and profile pictures anonymously. View Instagram without logging in — completely private and untraceable.</p>
-                </div>
-                <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
-                    <h3 style="color:white;margin-bottom:8px;">🎬 Instagram Reels Downloader</h3>
-                    <p style="color:#aaa;line-height:1.6;">Download Instagram reels in HD quality. Save any public reel to your device without watermark. Free IG reels downloader — works on iPhone, Android, and desktop.</p>
-                </div>
-            </div>
+ <!-- SEO Content Section -->
+ <div class="seo-section" style="padding:60px 0;background:#111;">
+ <div class="container">
+ <h2 style="text-align:center;color:white;font-size:1.8rem;margin-bottom:16px;">How to See Someone's Instagram Without an Account</h2>
+ <p style="text-align:center;color:#999;max-width:700px;margin:0 auto 40px;line-height:1.7;">Want to look at someone's Instagram but don't have an account? Don't want to sign up or log in? iPeep lets you check anyone's public posts, stories, and profile — no account needed, no app to download, nothing to install. Just type their name and go.</p>
+ <h3 style="text-align:center;color:#ccc;font-size:1.3rem;margin-bottom:16px;">Best Free Instagram Viewer — Picuki & StoriesIG Alternative</h3>
+ <p style="text-align:center;color:#999;max-width:700px;margin:0 auto 40px;line-height:1.7;">
+ iPeep is the #1 anonymous Instagram story viewer and downloader in 2026. View Instagram stories without an account, download IG reels, browse profiles privately — all for free. No login, no app, no trace.
+ </p>
+ 
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:40px;">
+ <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
+ <h3 style="color:white;margin-bottom:8px;"> Instagram Story Viewer</h3>
+ <p style="color:#aaa;line-height:1.6;">Watch Instagram stories anonymously without an account. No login, no sign up needed. Our IG story viewer lets you view stories from any public account without logging in. Better than Picuki, StoriesIG, and Anonyig.</p>
+ </div>
+ <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
+ <h3 style="color:white;margin-bottom:8px;"> Instagram Story Downloader</h3>
+ <p style="color:#aaa;line-height:1.6;">Save Instagram stories before they disappear. Download IG stories, reels, posts, and profile pictures in HD quality. Free Instagram story saver — no app needed.</p>
+ </div>
+ <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
+ <h3 style="color:white;margin-bottom:8px;"> Anonymous Profile Viewer</h3>
+ <p style="color:#aaa;line-height:1.6;">Browse Instagram profiles without an account or login. No sign up required — see posts, followers, bio, and profile pictures anonymously. View Instagram without logging in — completely private and untraceable.</p>
+ </div>
+ <div style="background:#1a1a1a;border-radius:12px;padding:24px;">
+ <h3 style="color:white;margin-bottom:8px;"> Instagram Reels Downloader</h3>
+ <p style="color:#aaa;line-height:1.6;">Download Instagram reels in HD quality. Save any public reel to your device without watermark. Free IG reels downloader — works on iPhone, Android, and desktop.</p>
+ </div>
+ </div>
 
-            <!-- Spanish SEO Section -->
-            <div style="background:#1a1a1a;border-radius:12px;padding:24px;margin-bottom:40px;">
-                <h3 style="color:white;margin-bottom:12px;">🌎 Ver Historias de Instagram Anónimamente — Gratis</h3>
-                <p style="color:#aaa;line-height:1.7;">iPeep es el mejor visor de historias de Instagram anónimo y gratuito. Ve stories de Instagram sin cuenta, descarga reels, fotos y videos de cualquier perfil público. No necesitas iniciar sesión ni instalar aplicaciones. Funciona en iPhone, Android y computadora. La mejor alternativa a Picuki, StoriesIG y Anonyig en 2026. Ver historias de Instagram sin que lo sepan — 100% anónimo y privado.</p>
-            </div>
+ <!-- Spanish SEO Section -->
+ <div style="background:#1a1a1a;border-radius:12px;padding:24px;margin-bottom:40px;">
+ <h3 style="color:white;margin-bottom:12px;"> Ver Historias de Instagram Anónimamente — Gratis</h3>
+ <p style="color:#aaa;line-height:1.7;">iPeep es el mejor visor de historias de Instagram anónimo y gratuito. Ve stories de Instagram sin cuenta, descarga reels, fotos y videos de cualquier perfil público. No necesitas iniciar sesión ni instalar aplicaciones. Funciona en iPhone, Android y computadora. La mejor alternativa a Picuki, StoriesIG y Anonyig en 2026. Ver historias de Instagram sin que lo sepan — 100% anónimo y privado.</p>
+ </div>
 
-            <!-- Portuguese SEO Section -->
-            <div style="background:#1a1a1a;border-radius:12px;padding:24px;margin-bottom:40px;">
-                <h3 style="color:white;margin-bottom:12px;">🇧🇷 Ver Stories do Instagram Anonimamente — Grátis</h3>
-                <p style="color:#aaa;line-height:1.7;">iPeep é o melhor visualizador anônimo de stories do Instagram. Veja stories, perfis e posts sem login. Baixe stories, reels e fotos em alta qualidade. Funciona no celular e computador. Alternativa ao Picuki e StoriesIG. Veja Instagram sem conta — 100% anônimo.</p>
-            </div>
+ <!-- Portuguese SEO Section -->
+ <div style="background:#1a1a1a;border-radius:12px;padding:24px;margin-bottom:40px;">
+ <h3 style="color:white;margin-bottom:12px;">🇧🇷 Ver Stories do Instagram Anonimamente — Grátis</h3>
+ <p style="color:#aaa;line-height:1.7;">iPeep é o melhor visualizador anônimo de stories do Instagram. Veja stories, perfis e posts sem login. Baixe stories, reels e fotos em alta qualidade. Funciona no celular e computador. Alternativa ao Picuki e StoriesIG. Veja Instagram sem conta — 100% anônimo.</p>
+ </div>
 
-            <h2 style="text-align:center;color:white;font-size:1.5rem;margin-bottom:24px;">Frequently Asked Questions</h2>
-            <div style="max-width:700px;margin:0 auto;">
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">Can I look at someone's Instagram stories without them knowing?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes! You don't need an Instagram account or to log in. Just type their username on iPeep and you can see their stories without them ever knowing. No app to download, no sign up — it just works.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">Is iPeep better than Picuki and StoriesIG?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">iPeep is a modern, faster alternative to Picuki, StoriesIG, Anonyig, and InstaStories. We offer story viewing, profile browsing, reels downloading, and post viewing — all in one tool. No ads blocking your view, no popups, just clean and fast Instagram viewing.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">How do I save someone's Instagram story to my phone?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">Just search their username, tap on their stories, and hit the download button. It saves right to your phone or computer. Works on iPhone, Android, and any browser — no app needed.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">Can I view private Instagram accounts?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">No. iPeep only works with public Instagram accounts. We respect privacy and cannot access private profiles. If an account is set to private, you'll need to follow them on Instagram to see their content.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">Is it legal to view Instagram stories anonymously?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes. Viewing publicly shared content on Instagram is completely legal. iPeep only accesses content that users have chosen to make public. We don't bypass any privacy settings or access restricted content.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">Does iPeep work on iPhone and Android?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes! iPeep works on all devices — iPhone, iPad, Android phones, tablets, Windows PC, Mac, and Linux. It's a web-based tool so there's nothing to install. Just visit ipeep.xyz in your browser.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">Can I check someone's Instagram without making an account?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes — that's exactly what iPeep is for. You don't need to create an Instagram account, log in, or sign up for anything. Just type the person's username and you can see their profile, posts, and stories right away.</p>
-                </details>
-                <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
-                    <summary style="color:white;font-weight:600;cursor:pointer;">How to view Instagram without logging in?</summary>
-                    <p style="color:#aaa;margin-top:12px;line-height:1.6;">Go to ipeep.xyz, type any public username in the search bar, and hit enter. You'll see their full profile, posts, stories, and reels — all without logging in or having an account. It's completely free.</p>
-                </details>
-            </div>
-        </div>
-    </div>
+ <h2 style="text-align:center;color:white;font-size:1.5rem;margin-bottom:24px;">Frequently Asked Questions</h2>
+ <div style="max-width:700px;margin:0 auto;">
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">Can I look at someone's Instagram stories without them knowing?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes! You don't need an Instagram account or to log in. Just type their username on iPeep and you can see their stories without them ever knowing. No app to download, no sign up — it just works.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">Is iPeep better than Picuki and StoriesIG?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">iPeep is a modern, faster alternative to Picuki, StoriesIG, Anonyig, and InstaStories. We offer story viewing, profile browsing, reels downloading, and post viewing — all in one tool. No ads blocking your view, no popups, just clean and fast Instagram viewing.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">How do I save someone's Instagram story to my phone?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">Just search their username, tap on their stories, and hit the download button. It saves right to your phone or computer. Works on iPhone, Android, and any browser — no app needed.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">Can I view private Instagram accounts?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">No. iPeep only works with public Instagram accounts. We respect privacy and cannot access private profiles. If an account is set to private, you'll need to follow them on Instagram to see their content.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">Is it legal to view Instagram stories anonymously?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes. Viewing publicly shared content on Instagram is completely legal. iPeep only accesses content that users have chosen to make public. We don't bypass any privacy settings or access restricted content.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">Does iPeep work on iPhone and Android?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes! iPeep works on all devices — iPhone, iPad, Android phones, tablets, Windows PC, Mac, and Linux. It's a web-based tool so there's nothing to install. Just visit ipeep.xyz in your browser.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">Can I check someone's Instagram without making an account?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">Yes — that's exactly what iPeep is for. You don't need to create an Instagram account, log in, or sign up for anything. Just type the person's username and you can see their profile, posts, and stories right away.</p>
+ </details>
+ <details style="background:#1a1a1a;border-radius:8px;padding:16px;margin-bottom:8px;">
+ <summary style="color:white;font-weight:600;cursor:pointer;">How to view Instagram without logging in?</summary>
+ <p style="color:#aaa;margin-top:12px;line-height:1.6;">Go to ipeep.xyz, type any public username in the search bar, and hit enter. You'll see their full profile, posts, stories, and reels — all without logging in or having an account. It's completely free.</p>
+ </details>
+ </div>
+ </div>
+ </div>
 </div>

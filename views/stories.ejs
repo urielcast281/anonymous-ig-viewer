@@ -1,284 +1,284 @@
 <div class="stories-container">
-    <!-- Stories Header -->
-    <div class="stories-header">
-        <div class="container">
-            <div class="stories-navigation">
-                <a href="/profile/<%= username %>" class="back-link">
-                    ← Back to Profile
-                </a>
-                <div class="stories-title">
-                    <h1>Stories by @<%= username %></h1>
-                    <% if (stories && stories.stories) { %>
-                    <p class="stories-count"><%= stories.stories.length %> active stories</p>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
+ <!-- Stories Header -->
+ <div class="stories-header">
+ <div class="container">
+ <div class="stories-navigation">
+ <a href="/profile/<%= username %>" class="back-link">
+ Back to Profile
+ </a>
+ <div class="stories-title">
+ <h1>Stories by @<%= username %></h1>
+ <% if (stories && stories.stories) { %>
+ <p class="stories-count"><%= stories.stories.length %> active stories</p>
+ <% } %>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <% if (stories && stories.stories && stories.stories.length > 0) { %>
+ <% if (stories && stories.stories && stories.stories.length > 0) { %>
 
-    <!-- Stories Grid -->
-    <div class="container">
-        <div class="stories-grid">
-            <% stories.stories.forEach((story, index) => { %>
-            <div class="story-card" data-index="<%= index %>">
-                <div class="story-preview" onclick="openStory(<%= index %>)">
-                    <% if (story.is_video) { %>
-                    <div class="story-video-badge">▶ Video</div>
-                    <% } %>
-                    <img src="/api/img?url=<%= encodeURIComponent(story.display_url) %>" 
-                         alt="Story <%= index + 1 %> by @<%= username %>"
-                         class="story-thumbnail"
-                         loading="lazy">
-                    <div class="story-overlay">
-                        <span class="story-time-badge">
-                            <%= Math.floor((Date.now() / 1000 - story.timestamp) / 3600) %>h ago
-                        </span>
-                    </div>
-                </div>
-                <a href="/api/img?url=<%= encodeURIComponent(story.is_video && story.video_url ? story.video_url : story.display_url) %>" 
-                   download="<%= username %>_story_<%= index + 1 %>.<%= story.is_video ? 'mp4' : 'jpg' %>"
-                   class="story-download-btn"
-                   onclick="event.stopPropagation()">
-                    ⬇ Download
-                </a>
-            </div>
-            <% }) %>
-        </div>
-    </div>
+ <!-- Stories Grid -->
+ <div class="container">
+ <div class="stories-grid">
+ <% stories.stories.forEach((story, index) => { %>
+ <div class="story-card" data-index="<%= index %>">
+ <div class="story-preview" onclick="openStory(<%= index %>)">
+ <% if (story.is_video) { %>
+ <div class="story-video-badge"> Video</div>
+ <% } %>
+ <img src="/api/img?url=<%= encodeURIComponent(story.display_url) %>" 
+ alt="Story <%= index + 1 %> by @<%= username %>"
+ class="story-thumbnail"
+ loading="lazy">
+ <div class="story-overlay">
+ <span class="story-time-badge">
+ <%= Math.floor((Date.now() / 1000 - story.timestamp) / 3600) %>h ago
+ </span>
+ </div>
+ </div>
+ <a href="/api/img?url=<%= encodeURIComponent(story.is_video && story.video_url ? story.video_url : story.display_url) %>" 
+ download="<%= username %>_story_<%= index + 1 %>.<%= story.is_video ? 'mp4' : 'jpg' %>"
+ class="story-download-btn"
+ onclick="event.stopPropagation()">
+ ⬇ Download
+ </a>
+ </div>
+ <% }) %>
+ </div>
+ </div>
 
-    <!-- Fullscreen Viewer (hidden by default) -->
-    <div class="story-fullscreen" id="storyFullscreen" style="display:none;">
-        <div class="fullscreen-backdrop" onclick="closeStory()"></div>
-        <div class="fullscreen-content">
-            <button class="fullscreen-close" onclick="closeStory()">✕</button>
-            <button class="fullscreen-nav fullscreen-prev" onclick="prevStoryFs()">‹</button>
-            <button class="fullscreen-nav fullscreen-next" onclick="nextStoryFs()">›</button>
-            <div class="fullscreen-media" id="fullscreenMedia"></div>
-            <div class="fullscreen-info">
-                <span class="fullscreen-counter" id="fullscreenCounter"></span>
-                <a href="#" class="fullscreen-download" id="fullscreenDownload" download>⬇ Download</a>
-            </div>
-        </div>
-    </div>
+ <!-- Fullscreen Viewer (hidden by default) -->
+ <div class="story-fullscreen" id="storyFullscreen" style="display:none;">
+ <div class="fullscreen-backdrop" onclick="closeStory()"></div>
+ <div class="fullscreen-content">
+ <button class="fullscreen-close" onclick="closeStory()"></button>
+ <button class="fullscreen-nav fullscreen-prev" onclick="prevStoryFs()">‹</button>
+ <button class="fullscreen-nav fullscreen-next" onclick="nextStoryFs()">›</button>
+ <div class="fullscreen-media" id="fullscreenMedia"></div>
+ <div class="fullscreen-info">
+ <span class="fullscreen-counter" id="fullscreenCounter"></span>
+ <a href="#" class="fullscreen-download" id="fullscreenDownload" download>⬇ Download</a>
+ </div>
+ </div>
+ </div>
 
-    <% } else { %>
-    <!-- No Stories Available -->
-    <div class="no-stories-section">
-        <div class="container">
-            <div class="empty-state">
-                <div class="empty-icon">📸</div>
-                <h2>No Active Stories</h2>
-                <% if (typeof noStoriesMessage !== 'undefined') { %>
-                <p><%= noStoriesMessage %></p>
-                <% } else { %>
-                <p>@<%= username %> currently has no active stories. Stories disappear after 24 hours.</p>
-                <% } %>
-                
-                <div class="empty-actions">
-                    <a href="/" class="btn btn-outline">
-                        🔍 Search Another User
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <% } %>
+ <% } else { %>
+ <!-- No Stories Available -->
+ <div class="no-stories-section">
+ <div class="container">
+ <div class="empty-state">
+ <div class="empty-icon"></div>
+ <h2>No Active Stories</h2>
+ <% if (typeof noStoriesMessage !== 'undefined') { %>
+ <p><%= noStoriesMessage %></p>
+ <% } else { %>
+ <p>@<%= username %> currently has no active stories. Stories disappear after 24 hours.</p>
+ <% } %>
+ 
+ <div class="empty-actions">
+ <a href="/" class="btn btn-outline">
+ Search Another User
+ </a>
+ </div>
+ </div>
+ </div>
+ </div>
+ <% } %>
 </div>
 
 <style>
 .stories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 24px;
-    padding: 24px 0;
-    max-width: 900px;
-    margin: 0 auto;
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+ gap: 24px;
+ padding: 24px 0;
+ max-width: 900px;
+ margin: 0 auto;
 }
 
 .story-card {
-    background: #1a1a2e;
-    border-radius: 16px;
-    overflow: hidden;
-    transition: transform 0.2s;
+ background: #1a1a2e;
+ border-radius: 16px;
+ overflow: hidden;
+ transition: transform 0.2s;
 }
 
 .story-card:hover {
-    transform: translateY(-4px);
+ transform: translateY(-4px);
 }
 
 .story-preview {
-    position: relative;
-    cursor: pointer;
-    aspect-ratio: 9/16;
-    overflow: hidden;
-    background: #0f0f1a;
+ position: relative;
+ cursor: pointer;
+ aspect-ratio: 9/16;
+ overflow: hidden;
+ background: #0f0f1a;
 }
 
 .story-thumbnail {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
 }
 
 .story-video-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    z-index: 2;
+ position: absolute;
+ top: 12px;
+ left: 12px;
+ background: rgba(0,0,0,0.7);
+ color: #fff;
+ padding: 4px 10px;
+ border-radius: 20px;
+ font-size: 12px;
+ font-weight: 600;
+ z-index: 2;
 }
 
 .story-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 12px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+ position: absolute;
+ bottom: 0;
+ left: 0;
+ right: 0;
+ padding: 12px;
+ background: linear-gradient(transparent, rgba(0,0,0,0.7));
 }
 
 .story-time-badge {
-    color: #ccc;
-    font-size: 13px;
+ color: #ccc;
+ font-size: 13px;
 }
 
 .story-download-btn {
-    display: block;
-    text-align: center;
-    padding: 14px;
-    color: #e1306c;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    transition: background 0.2s;
+ display: block;
+ text-align: center;
+ padding: 14px;
+ color: #e1306c;
+ text-decoration: none;
+ font-weight: 600;
+ font-size: 15px;
+ border-top: 1px solid rgba(255,255,255,0.08);
+ transition: background 0.2s;
 }
 
 .story-download-btn:hover {
-    background: rgba(225, 48, 108, 0.1);
+ background: rgba(225, 48, 108, 0.1);
 }
 
 /* Fullscreen Viewer */
 .story-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ z-index: 9999;
 }
 
 .fullscreen-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
+ position: absolute;
+ inset: 0;
+ background: rgba(0,0,0,0.95);
 }
 
 .fullscreen-content {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+ position: relative;
+ width: 100%;
+ height: 100%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-direction: column;
 }
 
 .fullscreen-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: #fff;
-    font-size: 24px;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 10;
+ position: absolute;
+ top: 20px;
+ right: 20px;
+ background: rgba(255,255,255,0.15);
+ border: none;
+ color: #fff;
+ font-size: 24px;
+ width: 44px;
+ height: 44px;
+ border-radius: 50%;
+ cursor: pointer;
+ z-index: 10;
 }
 
 .fullscreen-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: #fff;
-    font-size: 32px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    z-index: 10;
+ position: absolute;
+ top: 50%;
+ transform: translateY(-50%);
+ background: rgba(255,255,255,0.15);
+ border: none;
+ color: #fff;
+ font-size: 32px;
+ width: 50px;
+ height: 50px;
+ border-radius: 50%;
+ cursor: pointer;
+ z-index: 10;
 }
 
 .fullscreen-prev { left: 16px; }
 .fullscreen-next { right: 16px; }
 
 .fullscreen-media {
-    max-width: 90vw;
-    max-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+ max-width: 90vw;
+ max-height: 80vh;
+ display: flex;
+ align-items: center;
+ justify-content: center;
 }
 
 .fullscreen-media img,
 .fullscreen-media video {
-    max-width: 100%;
-    max-height: 80vh;
-    border-radius: 12px;
-    object-fit: contain;
+ max-width: 100%;
+ max-height: 80vh;
+ border-radius: 12px;
+ object-fit: contain;
 }
 
 .fullscreen-info {
-    margin-top: 16px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    color: #999;
-    font-size: 14px;
+ margin-top: 16px;
+ display: flex;
+ align-items: center;
+ gap: 20px;
+ color: #999;
+ font-size: 14px;
 }
 
 .fullscreen-download {
-    color: #e1306c;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 8px 16px;
-    border: 1px solid #e1306c;
-    border-radius: 8px;
+ color: #e1306c;
+ text-decoration: none;
+ font-weight: 600;
+ padding: 8px 16px;
+ border: 1px solid #e1306c;
+ border-radius: 8px;
 }
 
 .fullscreen-download:hover {
-    background: rgba(225, 48, 108, 0.15);
+ background: rgba(225, 48, 108, 0.15);
 }
 
 /* Mobile */
 @media (max-width: 600px) {
-    .stories-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        padding: 16px 0;
-    }
-    
-    .fullscreen-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 24px;
-    }
-    
-    .fullscreen-prev { left: 8px; }
-    .fullscreen-next { right: 8px; }
+ .stories-grid {
+ grid-template-columns: repeat(2, 1fr);
+ gap: 12px;
+ padding: 16px 0;
+ }
+ 
+ .fullscreen-nav {
+ width: 40px;
+ height: 40px;
+ font-size: 24px;
+ }
+ 
+ .fullscreen-prev { left: 8px; }
+ .fullscreen-next { right: 8px; }
 }
 </style>
 
@@ -288,52 +288,52 @@ const storiesData = <%- JSON.stringify((stories && stories.stories) || []) %>;
 const storyUsername = '<%= username %>';
 
 function openStory(index) {
-    currentFs = index;
-    renderFullscreen(index);
-    document.getElementById('storyFullscreen').style.display = 'block';
-    document.body.style.overflow = 'hidden';
+ currentFs = index;
+ renderFullscreen(index);
+ document.getElementById('storyFullscreen').style.display = 'block';
+ document.body.style.overflow = 'hidden';
 }
 
 function closeStory() {
-    document.getElementById('storyFullscreen').style.display = 'none';
-    document.body.style.overflow = '';
-    // Pause any video
-    const vid = document.querySelector('.fullscreen-media video');
-    if (vid) vid.pause();
+ document.getElementById('storyFullscreen').style.display = 'none';
+ document.body.style.overflow = '';
+ // Pause any video
+ const vid = document.querySelector('.fullscreen-media video');
+ if (vid) vid.pause();
 }
 
 function prevStoryFs() {
-    if (currentFs > 0) { currentFs--; renderFullscreen(currentFs); }
+ if (currentFs > 0) { currentFs--; renderFullscreen(currentFs); }
 }
 
 function nextStoryFs() {
-    if (currentFs < storiesData.length - 1) { currentFs++; renderFullscreen(currentFs); }
+ if (currentFs < storiesData.length - 1) { currentFs++; renderFullscreen(currentFs); }
 }
 
 function renderFullscreen(index) {
-    const story = storiesData[index];
-    const mediaDiv = document.getElementById('fullscreenMedia');
-    const counter = document.getElementById('fullscreenCounter');
-    const dlBtn = document.getElementById('fullscreenDownload');
-    
-    if (story.is_video && story.video_url) {
-        mediaDiv.innerHTML = `<video autoplay loop muted playsinline onclick="this.paused ? this.play() : this.pause(); this.muted = false;" src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}"></video>`;
-        dlBtn.href = `/api/img?url=${encodeURIComponent(story.video_url)}`;
-        dlBtn.download = `${storyUsername}_story_${index + 1}.mp4`;
-    } else {
-        mediaDiv.innerHTML = `<img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}">`;
-        dlBtn.href = `/api/img?url=${encodeURIComponent(story.display_url)}`;
-        dlBtn.download = `${storyUsername}_story_${index + 1}.jpg`;
-    }
-    
-    counter.textContent = `Story ${index + 1} of ${storiesData.length}`;
+ const story = storiesData[index];
+ const mediaDiv = document.getElementById('fullscreenMedia');
+ const counter = document.getElementById('fullscreenCounter');
+ const dlBtn = document.getElementById('fullscreenDownload');
+ 
+ if (story.is_video && story.video_url) {
+ mediaDiv.innerHTML = `<video autoplay loop muted playsinline onclick="this.paused ? this.play() : this.pause(); this.muted = false;" src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}"></video>`;
+ dlBtn.href = `/api/img?url=${encodeURIComponent(story.video_url)}`;
+ dlBtn.download = `${storyUsername}_story_${index + 1}.mp4`;
+ } else {
+ mediaDiv.innerHTML = `<img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}">`;
+ dlBtn.href = `/api/img?url=${encodeURIComponent(story.display_url)}`;
+ dlBtn.download = `${storyUsername}_story_${index + 1}.jpg`;
+ }
+ 
+ counter.textContent = `Story ${index + 1} of ${storiesData.length}`;
 }
 
 // Keyboard nav
 document.addEventListener('keydown', (e) => {
-    if (document.getElementById('storyFullscreen').style.display === 'none') return;
-    if (e.key === 'Escape') closeStory();
-    if (e.key === 'ArrowRight') nextStoryFs();
-    if (e.key === 'ArrowLeft') prevStoryFs();
+ if (document.getElementById('storyFullscreen').style.display === 'none') return;
+ if (e.key === 'Escape') closeStory();
+ if (e.key === 'ArrowRight') nextStoryFs();
+ if (e.key === 'ArrowLeft') prevStoryFs();
 });
 </script>
