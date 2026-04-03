@@ -52,7 +52,7 @@
  <div class="story-fullscreen" id="storyFullscreen" style="display:none;">
  <div class="fullscreen-backdrop" onclick="closeStory()"></div>
  <div class="fullscreen-content">
- <button class="fullscreen-close" onclick="closeStory()"></button>
+ <button class="fullscreen-close" onclick="closeStory()">X</button>
  <button class="fullscreen-nav fullscreen-prev" onclick="prevStoryFs()">‹</button>
  <button class="fullscreen-nav fullscreen-next" onclick="nextStoryFs()">›</button>
  <div class="fullscreen-media" id="fullscreenMedia"></div>
@@ -312,20 +312,25 @@ function nextStoryFs() {
 
 function renderFullscreen(index) {
  const story = storiesData[index];
+ if (!story) return;
  const mediaDiv = document.getElementById('fullscreenMedia');
  const counter = document.getElementById('fullscreenCounter');
  const dlBtn = document.getElementById('fullscreenDownload');
+ const videoSrc = story.video_url || story.video_versions?.[0]?.url;
  
- if (story.is_video && story.video_url) {
- mediaDiv.innerHTML = `<video autoplay playsinline src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}" onclick="this.paused ? this.play() : this.pause();"></video>`;
- // Try unmuted autoplay first, fall back to muted
+ if (story.is_video && videoSrc) {
+ mediaDiv.innerHTML = `<video autoplay playsinline muted src="/api/img?url=${encodeURIComponent(videoSrc)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}" onclick="this.muted=false; this.paused ? this.play() : this.pause();" style="max-width:100%;max-height:80vh;border-radius:12px;"></video>`;
  const vid = mediaDiv.querySelector('video');
- vid.muted = false;
- vid.play().catch(() => { vid.muted = true; vid.play(); });
- dlBtn.href = `/api/img?url=${encodeURIComponent(story.video_url)}`;
+ vid.play().catch(function(){});
+ dlBtn.href = `/api/img?url=${encodeURIComponent(videoSrc)}`;
  dlBtn.download = `${storyUsername}_story_${index + 1}.mp4`;
+ } else if (story.is_video && !videoSrc) {
+ // Video but no URL - show image with note
+ mediaDiv.innerHTML = `<div style="text-align:center;"><img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}" style="max-width:100%;max-height:70vh;border-radius:12px;"><p style="color:#999;margin-top:12px;">Video preview — tap Download for full video</p></div>`;
+ dlBtn.href = `/api/img?url=${encodeURIComponent(story.display_url)}`;
+ dlBtn.download = `${storyUsername}_story_${index + 1}.jpg`;
  } else {
- mediaDiv.innerHTML = `<img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}">`;
+ mediaDiv.innerHTML = `<img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}" style="max-width:100%;max-height:80vh;border-radius:12px;">`;
  dlBtn.href = `/api/img?url=${encodeURIComponent(story.display_url)}`;
  dlBtn.download = `${storyUsername}_story_${index + 1}.jpg`;
  }
