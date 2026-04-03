@@ -77,9 +77,6 @@
                 <% } %>
                 
                 <div class="empty-actions">
-                    <a href="/profile/<%= username %>" class="btn btn-primary">
-                        👤 View Profile Instead
-                    </a>
                     <a href="/" class="btn btn-outline">
                         🔍 Search Another User
                     </a>
@@ -320,7 +317,7 @@ function renderFullscreen(index) {
     const dlBtn = document.getElementById('fullscreenDownload');
     
     if (story.is_video && story.video_url) {
-        mediaDiv.innerHTML = `<video controls autoplay playsinline src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}"></video>`;
+        mediaDiv.innerHTML = `<video autoplay loop muted playsinline onclick="this.paused ? this.play() : this.pause(); this.muted = false;" src="/api/img?url=${encodeURIComponent(story.video_url)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}"></video>`;
         dlBtn.href = `/api/img?url=${encodeURIComponent(story.video_url)}`;
         dlBtn.download = `${storyUsername}_story_${index + 1}.mp4`;
     } else {

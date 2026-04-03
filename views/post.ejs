@@ -47,9 +47,13 @@
                     <% if (post.is_video && post.video_url) { %>
                     <div class="post-video-wrapper">
                         <video class="post-video" 
-                               controls 
+                               autoplay
+                               loop
+                               muted
+                               playsinline
                                poster="<%= post.display_url %>"
-                               preload="metadata">
+                               preload="metadata"
+                               onclick="this.paused ? this.play() : this.pause(); this.muted = false;">
                             <source src="<%= post.video_url %>" type="video/mp4">
                             <p>Your browser does not support the video element.</p>
                         </video>
@@ -234,9 +238,6 @@
                             </div>
                         </a>
                         <div class="author-actions">
-                            <a href="/profile/<%= post.owner.username %>" class="btn btn-primary">
-                                View Profile
-                            </a>
                             <a href="/stories/<%= post.owner.username %>" class="btn btn-outline">
                                 View Stories
                             </a>
