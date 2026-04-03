@@ -54,10 +54,10 @@
  </div>
  </div>
 
- <!-- Fullscreen Viewer (hidden by default) -->
+ <!-- Fullscreen Story Viewer Modal -->
  <div class="story-fullscreen" id="storyFullscreen" style="display:none;">
  <div class="fullscreen-backdrop" onclick="closeStory()"></div>
- <div class="fullscreen-content">
+ <div class="fullscreen-content" style="overflow-y:auto;-webkit-overflow-scrolling:touch;">
  <button class="fullscreen-close" onclick="closeStory()">X</button>
  <button class="fullscreen-nav fullscreen-prev" onclick="prevStoryFs()">&lsaquo;</button>
  <button class="fullscreen-nav fullscreen-next" onclick="nextStoryFs()">&rsaquo;</button>
@@ -65,6 +65,12 @@
  <div class="fullscreen-info">
  <span class="fullscreen-counter" id="fullscreenCounter"></span>
  <a href="#" class="fullscreen-download ipeep-download-btn" id="fullscreenDownload" download>Download</a>
+ </div>
+ <!-- Ad inside story modal -->
+ <div style="margin-top:16px;max-width:400px;width:100%;text-align:center;">
+ <div style="color:#666;font-size:11px;margin-bottom:4px;">Advertisement</div>
+ <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
+ <div id="container-7b466dd839b40ecfeb07def8c857f3b2"></div>
  </div>
  </div>
  </div>
@@ -233,7 +239,8 @@
 
 .fullscreen-media {
  max-width: 90vw;
- max-height: 80vh;
+ max-height: 75vh;
+ width: 100%;
  display: flex;
  align-items: center;
  justify-content: center;
@@ -242,9 +249,23 @@
 .fullscreen-media img,
 .fullscreen-media video {
  max-width: 100%;
- max-height: 80vh;
+ max-height: 75vh;
+ width: auto;
  border-radius: 12px;
  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+ .fullscreen-media {
+ max-width: 100vw;
+ max-height: 70vh;
+ }
+ .fullscreen-media img,
+ .fullscreen-media video {
+ max-width: 100vw;
+ max-height: 70vh;
+ border-radius: 0;
+ }
 }
 
 .fullscreen-info {
@@ -296,48 +317,8 @@ var storiesData = <%- JSON.stringify((stories && stories.stories) || []) %>;
 var storyUsername = '<%= username %>';
 
 function playStory(el, index) {
- var story = storiesData[index];
- if (!story) return;
- var videoSrc = story.video_url;
- 
- if (story.is_video && videoSrc) {
-   var card = el.closest('.story-card');
-   var preview = card.querySelector('.story-preview');
-   preview.onclick = null;
-   
-   var proxyUrl = '/api/img?url=' + encodeURIComponent(videoSrc);
-   
-   var video = document.createElement('video');
-   video.autoplay = true;
-   video.playsInline = true;
-   video.muted = false;
-   video.setAttribute('playsinline', '');
-   video.poster = '/api/img?url=' + encodeURIComponent(story.display_url);
-   video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000;';
-   video.src = proxyUrl;
-   
-   video.onerror = function() {
-     if (this.src !== videoSrc) {
-       this.src = videoSrc;
-     }
-   };
-   
-   video.addEventListener('click', function() {
-     if (this.paused) this.play(); else this.pause();
-   });
-   
-   preview.innerHTML = '';
-   preview.appendChild(video);
-   video.play().catch(function(e) {
-     video.muted = true;
-     video.play().catch(function(){});
-   });
- } else if (story.is_video && !videoSrc) {
-   // Video but no URL available — show message
-   alert('Video URL not available. Instagram may have expired this story.');
- } else {
-   openStory(index);
- }
+ // All stories open in fullscreen modal
+ openStory(index);
 }
 
 function openStory(index) {
@@ -372,8 +353,9 @@ function renderFullscreen(index) {
  
  if (story.is_video && videoSrc) {
  var proxyV = '/api/img?url=' + encodeURIComponent(videoSrc);
- mediaDiv.innerHTML = '<video autoplay playsinline src="' + proxyV + '" poster="/api/img?url=' + encodeURIComponent(story.display_url) + '" onclick="this.muted=!this.muted; this.paused ? this.play() : this.pause();" style="max-width:100%;max-height:80vh;border-radius:12px;" onerror="if(this.src!==\'' + videoSrc + '\')this.src=\'' + videoSrc + '\'"></video>';
+ mediaDiv.innerHTML = '<video autoplay playsinline src="' + proxyV + '" poster="/api/img?url=' + encodeURIComponent(story.display_url) + '" style="max-width:100%;max-height:75vh;border-radius:12px;cursor:pointer;" onerror="if(this.src!==\'' + videoSrc + '\')this.src=\'' + videoSrc + '\'"></video>';
  var vid = mediaDiv.querySelector('video');
+ vid.addEventListener('click', function() { if (this.paused) this.play(); else this.pause(); });
  vid.play().catch(function(){ vid.muted = true; vid.play().catch(function(){}); });
  dlBtn.href = proxyV;
  dlBtn.download = storyUsername + '_story_' + (index + 1) + '.mp4';
