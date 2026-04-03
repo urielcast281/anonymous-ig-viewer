@@ -2235,22 +2235,23 @@ ul { list-style: none; }
 /* ============================================
    Scrolling Ticker Banner
    ============================================ */
+/* ─── News Ticker (Marquee) ─── */
 .ticker-bar {
-  width: 100%;
   overflow: hidden;
-  background: #0a0a0a;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  padding: 8px 0;
-  position: relative;
-  z-index: 10;
+  background: rgba(0,0,0,0.6);
+  border-bottom: 1px solid rgba(131,58,180,0.3);
+  padding: 0.4rem 0;
+  white-space: nowrap;
 }
 
 .ticker-track {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: nowrap;
+  display: inline-block;
   white-space: nowrap;
   animation: tickerScroll 30s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
 }
 
 @keyframes tickerScroll {
@@ -2259,22 +2260,27 @@ ul { list-style: none; }
 }
 
 .ticker-item {
-  color: #E1306C;
+  display: inline-block;
+  padding: 0 2rem;
+  color: rgba(255,255,255,0.6);
   font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 0 20px;
-  flex-shrink: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
 }
 
-.ticker-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #833AB4;
+.ticker-item .ticker-highlight {
+  color: #E1306C;
+  font-weight: 700;
+}
+
+.ticker-item .ticker-gold {
+  color: #FCAF45;
+}
+
+.ticker-separator {
   display: inline-block;
-  flex-shrink: 0;
+  color: rgba(131,58,180,0.5);
+  padding: 0 0.5rem;
 }
 
 .ticker-track-reverse {
@@ -2288,9 +2294,5 @@ ul { list-style: none; }
 
 .ticker-bar-bottom {
   border-bottom: none;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.ticker-bar-bottom .ticker-item {
-  color: #FCAF45;
+  border-top: 1px solid rgba(131,58,180,0.3);
 }
