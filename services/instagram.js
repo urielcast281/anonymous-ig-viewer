@@ -4,6 +4,7 @@ const config = require('../config');
 const cache = require('./cache');
 const igDirect = require('./instagram-direct');
 const InstagramWebSession = require('./instagram-web-session');
+const igMobile = require('./instagram-mobile-api');
 
 const igWeb = new InstagramWebSession();
 
@@ -60,6 +61,46 @@ class InstagramService {
     if (cached) return cached;
 
     let profileData = null;
+
+    // Priority -1: Mobile Private API (burner account, Android emulation) — highest limits
+    if (igMobile.isConfigured) {
+      try {
+        console.log(`📱 Trying mobile API for: ${username}`);
+        const { profile: p, posts } = await igMobile.getProfileWithPosts(username, 12);
+        if (p) {
+          profileData = {
+            id: p.id,
+            username: p.username,
+            full_name: p.full_name || p.username,
+            biography: p.biography || '',
+            profile_pic_url: p.profile_pic_url || '/images/default-avatar.svg',
+            profile_pic_url_hd: p.profile_pic_url_hd || p.profile_pic_url || '/images/default-avatar.svg',
+            followers_count: p.followers_count || p.follower_count || 0,
+            following_count: p.following_count || 0,
+            posts_count: p.posts_count || p.post_count || 0,
+            is_verified: p.is_verified || false,
+            is_private: p.is_private || false,
+            external_url: p.external_url || '',
+            recent_posts: posts.map((post, i) => ({
+              id: post.id || `post_${i}`,
+              shortcode: post.shortcode || `code_${i}`,
+              display_url: post.display_url || post.thumbnail_url || '',
+              thumbnail_url: post.thumbnail_url || post.display_url || '',
+              is_video: post.is_video || false,
+              likes_count: post.likes_count || post.like_count || 0,
+              comments_count: post.comments_count || post.comment_count || 0,
+              caption: post.caption || '',
+              timestamp: post.timestamp || (Date.now() / 1000 - i * 86400),
+            })),
+          };
+          console.log(`✅ Got real data for @${username} via mobile API`);
+          await cache.set('profile', username, profileData);
+          return profileData;
+        }
+      } catch (e) {
+        console.log(`Mobile API failed: ${e.message}`);
+      }
+    }
 
     // Priority 0: Web Session API (burner browser cookies) — fastest & free
     if (igWeb.isReady()) {
@@ -219,6 +260,34 @@ class InstagramService {
     if (cached) return cached;
 
     let storiesData = null;
+
+    // Priority -1: Mobile API stories
+    if (igMobile.isConfigured) {
+      try {
+        const uid = userId || (await igMobile.getProfile(username).catch(() => null))?.id;
+        if (uid) {
+          const stories = await igMobile.getStories(uid);
+          if (stories && stories.length > 0) {
+            storiesData = {
+              user: { username, profile_pic_url: '/images/default-avatar.svg' },
+              stories: stories.map((s, i) => ({
+                id: s.id || `story_${i}`,
+                display_url: s.display_url || '',
+                is_video: s.is_video || false,
+                video_url: s.video_url || null,
+                timestamp: s.timestamp || (Date.now() / 1000 - i * 3600),
+                expires_at: s.expires_at || (Date.now() / 1000 + 86400),
+              })),
+            };
+            console.log(`✅ Got ${stories.length} stories for @${username} via mobile API`);
+            await cache.set('stories', username, storiesData);
+            return storiesData;
+          }
+        }
+      } catch (e) {
+        console.log(`Mobile API stories failed: ${e.message}`);
+      }
+    }
 
     // Priority 0: Web Session
     if (igWeb.isReady()) {
