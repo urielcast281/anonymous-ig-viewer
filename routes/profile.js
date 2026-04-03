@@ -13,7 +13,8 @@ router.get('/:username', async (req, res) => {
     return res.status(400).render('error', {
       error: { status: 400, message: 'Invalid username format' },
       title: 'Invalid Username - InstaViewer',
-      description: 'The username provided is not valid.'
+      description: 'The username provided is not valid.',
+      metaData: seo.getHomeMeta()
     });
   }
 
@@ -27,7 +28,9 @@ router.get('/:username', async (req, res) => {
       return res.status(503).render('error', {
         error: { status: 503, message: `We couldn't load @${username}'s profile right now. Our Instagram data service is temporarily unavailable. Please try again in a few minutes.` },
         title: `@${username} - Temporarily Unavailable`,
-        description: `The Instagram profile @${username} is temporarily unavailable. Please try again later.`
+        description: `The Instagram profile @${username} is temporarily unavailable. Please try again later.`,
+        metaData: seo.getHomeMeta(),
+        username
       });
     }
 
@@ -126,40 +129,18 @@ router.get('/:username/posts', async (req, res) => {
     const totalPosts = profile.recent_posts.length;
     const totalPages = Math.ceil(totalPosts / limit);
 
-    if (req.headers.accept && req.headers.accept.includes('application/json')) {
-      // API response
-      res.json({
-        posts,
-        pagination: {
-          page,
-          limit,
-          totalPosts,
-          totalPages,
-          hasNext: page < totalPages,
-          hasPrev: page > 1
-        }
-      });
-    } else {
-      // HTML response
-      const metaData = seo.getProfileMeta(username, profile);
-      metaData.title = `@${username} Posts - Page ${page}`;
-      
-      res.render('profile-posts', {
-        metaData,
-        profile,
-        posts,
-        username,
-        pagination: {
-          page,
-          limit,
-          totalPosts,
-          totalPages,
-          hasNext: page < totalPages,
-          hasPrev: page > 1
-        },
-        pageTitle: `@${username} Posts - Page ${page}`
-      });
-    }
+    // Always JSON — no separate posts template
+    res.json({
+      posts,
+      pagination: {
+        page,
+        limit,
+        totalPosts,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
 
   } catch (error) {
     console.error(`❌ Profile posts error for ${username}:`, error);

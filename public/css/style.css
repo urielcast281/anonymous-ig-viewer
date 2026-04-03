@@ -2137,3 +2137,97 @@ ul { list-style: none; }
   background: var(--accent-pink);
   color: white;
 }
+
+/* ============================================
+   LOADING SPINNER — Neon Rainbow
+   ============================================ */
+.ipeep-spinner-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ipeep-spinner-overlay.active {
+  display: flex;
+}
+
+.ipeep-spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  border-top-color: #f09433;
+  border-right-color: #e6683c;
+  border-bottom-color: #dc2743;
+  border-left-color: #bc1888;
+  animation: ipeep-spin 0.8s linear infinite, ipeep-glow 2s ease-in-out infinite;
+}
+
+.ipeep-spinner-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+@keyframes ipeep-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ipeep-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(225, 48, 108, 0.4), 0 0 30px rgba(131, 58, 180, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(252, 175, 69, 0.5), 0 0 50px rgba(225, 48, 108, 0.3);
+  }
+}
+
+/* ============================================
+   BUTTON / FORM POLISH
+   ============================================ */
+.btn, .action-btn, .control-btn, .search-btn, .search-btn-large, .story-download-btn, .tool-btn {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn:active, .action-btn:active, .control-btn:active, .search-btn-large:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+.btn[disabled], .search-btn-large[disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ============================================
+   TEXT OVERFLOW SAFETY
+   ============================================ */
+.profile-username, .user-username, .profile-fullname, .user-fullname,
+.profile-bio p, .caption-text, .author-username, .hero-title,
+.related-username, .trending-username, .metadata-value, .info-value {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.user-username, .profile-username, .related-username, .trending-username {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.profile-info-section .profile-username {
+  white-space: normal;
+}

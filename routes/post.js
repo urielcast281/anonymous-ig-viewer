@@ -13,7 +13,8 @@ router.get('/:shortcode', async (req, res) => {
     return res.status(400).render('error', {
       error: { status: 400, message: 'Invalid post shortcode format' },
       title: 'Invalid Post Code - InstaViewer',
-      description: 'The post shortcode provided is not valid.'
+      description: 'The post shortcode provided is not valid.',
+      metaData: seo.getHomeMeta()
     });
   }
 
@@ -27,7 +28,8 @@ router.get('/:shortcode', async (req, res) => {
       return res.status(404).render('error', {
         error: { status: 404, message: 'Post not found' },
         title: `Post ${shortcode} - Not Found`,
-        description: `The Instagram post ${shortcode} could not be found or is no longer available.`
+        description: `The Instagram post ${shortcode} could not be found or is no longer available.`,
+        metaData: seo.getHomeMeta()
       });
     }
 
@@ -189,12 +191,9 @@ router.get('/:shortcode/embed', async (req, res) => {
       });
     }
 
-    // Render minimal embed template
-    res.render('post-embed', {
-      post,
-      shortcode,
-      layout: false // No main layout for embeds
-    });
+    // Render minimal embed inline (no separate template needed)
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}img,video{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body>${post.is_video && post.video_url ? `<video src="${post.video_url}" poster="${post.display_url}" autoplay loop muted playsinline controls></video>` : `<img src="${post.display_url}" alt="Post">`}</body></html>`;
+    res.send(html);
 
   } catch (error) {
     console.error(`❌ Post embed error for ${shortcode}:`, error);

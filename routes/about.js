@@ -79,7 +79,8 @@ router.get('/', async (req, res) => {
     res.status(500).render('error', {
       error: { status: 500, message: 'Failed to load about page' },
       title: 'Error - InstaViewer',
-      description: 'An error occurred while loading the about page'
+      description: 'An error occurred while loading the about page',
+      metaData: seo.getAboutMeta()
     });
   }
 });

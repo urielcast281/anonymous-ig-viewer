@@ -13,7 +13,8 @@ router.get('/:username', async (req, res) => {
     return res.status(400).render('error', {
       error: { status: 400, message: 'Invalid username format' },
       title: 'Invalid Username - InstaViewer',
-      description: 'The username provided is not valid.'
+      description: 'The username provided is not valid.',
+      metaData: seo.getHomeMeta()
     });
   }
 
@@ -153,7 +154,8 @@ router.get('/:username/:storyId', async (req, res) => {
       return res.status(404).render('error', {
         error: { status: 404, message: 'Stories not found' },
         title: `@${username} Stories - Not Found`,
-        description: 'The requested stories could not be found.'
+        description: 'The requested stories could not be found.',
+        metaData: seo.getHomeMeta()
       });
     }
 
@@ -163,7 +165,8 @@ router.get('/:username/:storyId', async (req, res) => {
       return res.status(404).render('error', {
         error: { status: 404, message: 'Story not found' },
         title: `@${username} Story - Not Found`,
-        description: 'The requested story could not be found or has expired.'
+        description: 'The requested story could not be found or has expired.',
+        metaData: seo.getHomeMeta()
       });
     }
 
@@ -173,12 +176,12 @@ router.get('/:username/:storyId', async (req, res) => {
     metaData.description = `View @${username} Instagram story anonymously without logging in.`;
     metaData.ogImage = story.display_url;
 
-    res.render('story-single', {
+    // Reuse the stories template — all stories are shown and JS can focus on the right one
+    res.render('stories', {
       metaData,
       structuredData: seo.getHomeStructuredData(),
-      profile: stories.user,
-      story,
-      stories: stories.stories,
+      profile: stories.user ? { ...stories.user } : null,
+      stories: { stories: stories.stories },
       username,
       pageTitle: `@${username} Story`
     });
@@ -188,7 +191,8 @@ router.get('/:username/:storyId', async (req, res) => {
     res.status(500).render('error', {
       error: { status: 500, message: 'Story unavailable' },
       title: `@${username} Story - Unavailable`,
-      description: 'The requested story is temporarily unavailable.'
+      description: 'The requested story is temporarily unavailable.',
+      metaData: seo.getHomeMeta()
     });
   }
 });

@@ -310,9 +310,25 @@ function shareProfile(username) {
 }
 
 function loadMorePosts(username) {
- // This would typically make an AJAX request to load more posts
- // For now, redirect to a posts page
- window.location.href = `/profile/${username}/posts`;
+ const btn = event.target;
+ btn.disabled = true;
+ btn.textContent = 'Loading…';
+ fetch(`/profile/${username}/posts?page=2`, { headers: { 'Accept': 'application/json' } })
+ .then(r => r.json())
+ .then(data => {
+   if (data.posts && data.posts.length) {
+     const grid = document.querySelector('.posts-grid');
+     data.posts.forEach(p => {
+       const div = document.createElement('div');
+       div.className = 'post-item';
+       div.style.cursor = 'pointer';
+       div.innerHTML = `<div class="post-media"><img src="/api/img?url=${encodeURIComponent(p.thumbnail_url || p.display_url)}" alt="Post" loading="lazy"></div>`;
+       grid.appendChild(div);
+     });
+   }
+   btn.textContent = 'No More Posts';
+ })
+ .catch(() => { btn.textContent = 'Load More Posts'; btn.disabled = false; });
 }
 </script>
 
