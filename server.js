@@ -46,7 +46,7 @@ app.use(compression());
 app.use(cors());
 
 // Static files FIRST (before rate limiter so CSS/JS/images always load)
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '7d' }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
