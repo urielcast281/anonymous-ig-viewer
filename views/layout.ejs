@@ -19,11 +19,6 @@
  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','<%= config.GA_TRACKING_ID %>');</script>
  <% } %>
 
- <% /* AdSense */ %>
- <% if (config.ADS.ENABLE_ADS && config.ADS.GOOGLE_ADSENSE_CLIENT) { %>
- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>" crossorigin="anonymous"></script>
- <% } %>
-
  <!-- Adsterra Social Bar -->
  <script src="https://pl28772947.effectivegatecpm.com/11/2a/44/112a4451f89eb82797367144be67b6b7.js"></script>
  <!-- Monetag Multitag -->
@@ -32,19 +27,6 @@
 <body>
  <header class="header">
  <div class="container">
- <% /* Adsterra Banner Ad */ %>
- <% if (config.ADS.ENABLE_ADS && config.ADS.ADSTERRA_BANNER_ID) { %>
- <div class="ad-slot ad-banner-top" id="adsterra-banner-top">
- <div class="ad-label">Advertisement</div>
- <script src="//ad.a-ads.com/<%= config.ADS.ADSTERRA_BANNER_ID %>?size=728x90" async></script>
- </div>
- <% } else if (config.ADS.ENABLE_ADS && config.ADS.GOOGLE_ADSENSE_CLIENT) { %>
- <div class="ad-slot ad-banner-top">
- <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_BANNER %>"></ins>
- <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
- </div>
- <% } %>
- 
  <nav class="navbar">
  <div class="nav-brand">
  <a href="/" class="logo">
@@ -79,29 +61,29 @@
  <div class="ticker-bar">
  <div class="ticker-track">
  <span class="ticker-item"><span class="ticker-highlight">NEW:</span> View Instagram stories 100% anonymously</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">No account needed — just search and browse</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Download posts & reels in <span class="ticker-highlight">HD quality</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item"><span class="ticker-gold">100% free</span> — no sign up required</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Best <span class="ticker-highlight">Picuki alternative</span> in 2026</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">They will <span class="ticker-gold">never know</span> you viewed their profile</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item"><span class="ticker-highlight">NEW:</span> View Instagram stories 100% anonymously</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">No account needed — just search and browse</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Download posts & reels in <span class="ticker-highlight">HD quality</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item"><span class="ticker-gold">100% free</span> — no sign up required</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Best <span class="ticker-highlight">Picuki alternative</span> in 2026</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">They will <span class="ticker-gold">never know</span> you viewed their profile</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  </div>
  </div>
 
@@ -113,25 +95,25 @@
  <div class="ticker-bar ticker-bar-bottom">
  <div class="ticker-track ticker-track-reverse">
  <span class="ticker-item">Trusted by <span class="ticker-gold">thousands</span> worldwide</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Works on <span class="ticker-highlight">all devices</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">No app download needed</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">View stories before they <span class="ticker-highlight">expire</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Save reels & posts in <span class="ticker-gold">HD</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Trusted by <span class="ticker-gold">thousands</span> worldwide</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Works on <span class="ticker-highlight">all devices</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">No app download needed</span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">View stories before they <span class="ticker-highlight">expire</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  <span class="ticker-item">Save reels & posts in <span class="ticker-gold">HD</span></span>
- <span class="ticker-separator">◆</span>
+ <span class="ticker-separator">&#9670;</span>
  </div>
  </div>
 
@@ -180,7 +162,7 @@
  <!-- Self-Promo Banner (always visible) -->
  <div style="text-align:center;margin:20px auto;max-width:728px;background:linear-gradient(135deg,#833AB4,#E1306C,#F77737);padding:16px 24px;border-radius:12px;">
  <p style="color:white;font-weight:700;font-size:1.1rem;margin:0;"> Browse Instagram 100% Anonymously</p>
- <p style="color:rgba(255,255,255,0.85);font-size:0.85rem;margin:6px 0 0;">No account needed • No login • No sign up • Free forever</p>
+ <p style="color:rgba(255,255,255,0.85);font-size:0.85rem;margin:6px 0 0;">No account needed &bull; No login &bull; No sign up &bull; Free forever</p>
  </div>
  
  <div class="footer-bottom">
@@ -190,10 +172,20 @@
  </div>
  </footer>
 
- <% /* Adsterra Popunder */ %>
- <% if (config.ADS.ENABLE_ADS && config.ADS.ADSTERRA_POPUNDER_ID) { %>
- <script src="//pl<%= config.ADS.ADSTERRA_POPUNDER_ID %>.profitablegatecpm.com/p.js" async></script>
- <% } %>
+ <!-- Adsterra Popunder -->
+ <!-- TODO: Replace POPUNDER_SCRIPT_ID with actual Adsterra popunder ID from dashboard -->
+ <script type="text/javascript" data-cfasync="false">
+ // Adsterra Popunder - fires once per session
+ (function(){
+   if (sessionStorage.getItem('_pop_shown')) return;
+   var s = document.createElement('script');
+   s.type = 'text/javascript';
+   // TODO: Get actual popunder script URL from Adsterra dashboard and replace this placeholder
+   // s.src = '//pl{YOUR_POPUNDER_ID}.profitablegatecpm.com/p.js';
+   // document.head.appendChild(s);
+   sessionStorage.setItem('_pop_shown', '1');
+ })();
+ </script>
 
  <!-- Loading Spinner Overlay -->
  <div class="ipeep-spinner-overlay" id="ipeepSpinner">

@@ -21,7 +21,7 @@
  <!-- Stories Grid -->
  <div class="container">
  <div class="stories-grid">
- <% stories.stories.forEach((story, index) => { %>
+ <% stories.stories.forEach(function(story, index) { %>
  <div class="story-card" data-index="<%= index %>">
  <div class="story-preview" onclick="playStory(this, <%= index %>)">
  <% if (story.is_video) { %>
@@ -39,12 +39,18 @@
  </div>
  <a href="/api/img?url=<%= encodeURIComponent(story.is_video && story.video_url ? story.video_url : story.display_url) %>" 
  download="<%= username %>_story_<%= index + 1 %>.<%= story.is_video ? 'mp4' : 'jpg' %>"
- class="story-download-btn"
+ class="story-download-btn ipeep-download-btn"
  onclick="event.stopPropagation()">
- ⬇ Download
+ Download
  </a>
  </div>
  <% }) %>
+ </div>
+
+ <!-- Adsterra Native Banner - After Stories Grid -->
+ <div style="text-align:center;margin:32px auto;max-width:728px;">
+ <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
+ <div id="container-stories-7b466dd839b40ecfeb07def8c857f3b2"></div>
  </div>
  </div>
 
@@ -53,12 +59,12 @@
  <div class="fullscreen-backdrop" onclick="closeStory()"></div>
  <div class="fullscreen-content">
  <button class="fullscreen-close" onclick="closeStory()">X</button>
- <button class="fullscreen-nav fullscreen-prev" onclick="prevStoryFs()">‹</button>
- <button class="fullscreen-nav fullscreen-next" onclick="nextStoryFs()">›</button>
+ <button class="fullscreen-nav fullscreen-prev" onclick="prevStoryFs()">&lsaquo;</button>
+ <button class="fullscreen-nav fullscreen-next" onclick="nextStoryFs()">&rsaquo;</button>
  <div class="fullscreen-media" id="fullscreenMedia"></div>
  <div class="fullscreen-info">
  <span class="fullscreen-counter" id="fullscreenCounter"></span>
- <a href="#" class="fullscreen-download" id="fullscreenDownload" download>⬇ Download</a>
+ <a href="#" class="fullscreen-download ipeep-download-btn" id="fullscreenDownload" download>Download</a>
  </div>
  </div>
  </div>
@@ -90,7 +96,7 @@
 <style>
 .stories-grid {
  display: grid;
- grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+ grid-template-columns: repeat(3, 1fr);
  gap: 24px;
  padding: 24px 0;
  max-width: 900px;
@@ -264,13 +270,15 @@
 }
 
 /* Mobile */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
  .stories-grid {
  grid-template-columns: repeat(2, 1fr);
  gap: 12px;
  padding: 16px 0;
  }
- 
+}
+
+@media (max-width: 600px) {
  .fullscreen-nav {
  width: 40px;
  height: 40px;
@@ -283,26 +291,24 @@
 </style>
 
 <script>
-let currentFs = 0;
-const storiesData = <%- JSON.stringify((stories && stories.stories) || []) %>;
-const storyUsername = '<%= username %>';
+var currentFs = 0;
+var storiesData = <%- JSON.stringify((stories && stories.stories) || []) %>;
+var storyUsername = '<%= username %>';
 
 function playStory(el, index) {
- const story = storiesData[index];
+ var story = storiesData[index];
  if (!story) return;
- const videoSrc = story.video_url || (story.video_versions && story.video_versions[0] && story.video_versions[0].url);
+ var videoSrc = story.video_url || (story.video_versions && story.video_versions[0] && story.video_versions[0].url);
  
  if (story.is_video && videoSrc) {
-   // Replace thumbnail with inline video
-   const card = el.closest('.story-card');
-   const preview = card.querySelector('.story-preview');
+   var card = el.closest('.story-card');
+   var preview = card.querySelector('.story-preview');
    preview.onclick = null;
    preview.innerHTML = '<video autoplay playsinline muted controls src="/api/img?url=' + encodeURIComponent(videoSrc) + '" style="width:100%;border-radius:12px 12px 0 0;display:block;background:#000;" poster="/api/img?url=' + encodeURIComponent(story.display_url) + '"></video>';
-   const vid = preview.querySelector('video');
+   var vid = preview.querySelector('video');
    vid.play().catch(function(){});
    vid.addEventListener('click', function() { this.muted = false; });
  } else {
-   // Photo — open fullscreen
    openStory(index);
  }
 }
@@ -317,8 +323,7 @@ function openStory(index) {
 function closeStory() {
  document.getElementById('storyFullscreen').style.display = 'none';
  document.body.style.overflow = '';
- // Pause any video
- const vid = document.querySelector('.fullscreen-media video');
+ var vid = document.querySelector('.fullscreen-media video');
  if (vid) vid.pause();
 }
 
@@ -331,35 +336,34 @@ function nextStoryFs() {
 }
 
 function renderFullscreen(index) {
- const story = storiesData[index];
+ var story = storiesData[index];
  if (!story) return;
- const mediaDiv = document.getElementById('fullscreenMedia');
- const counter = document.getElementById('fullscreenCounter');
- const dlBtn = document.getElementById('fullscreenDownload');
- const videoSrc = story.video_url || story.video_versions?.[0]?.url;
+ var mediaDiv = document.getElementById('fullscreenMedia');
+ var counter = document.getElementById('fullscreenCounter');
+ var dlBtn = document.getElementById('fullscreenDownload');
+ var videoSrc = story.video_url || (story.video_versions && story.video_versions[0] && story.video_versions[0].url);
  
  if (story.is_video && videoSrc) {
- mediaDiv.innerHTML = `<video autoplay playsinline muted src="/api/img?url=${encodeURIComponent(videoSrc)}" poster="/api/img?url=${encodeURIComponent(story.display_url)}" onclick="this.muted=false; this.paused ? this.play() : this.pause();" style="max-width:100%;max-height:80vh;border-radius:12px;"></video>`;
- const vid = mediaDiv.querySelector('video');
+ mediaDiv.innerHTML = '<video autoplay playsinline muted src="/api/img?url=' + encodeURIComponent(videoSrc) + '" poster="/api/img?url=' + encodeURIComponent(story.display_url) + '" onclick="this.muted=false; this.paused ? this.play() : this.pause();" style="max-width:100%;max-height:80vh;border-radius:12px;"></video>';
+ var vid = mediaDiv.querySelector('video');
  vid.play().catch(function(){});
- dlBtn.href = `/api/img?url=${encodeURIComponent(videoSrc)}`;
- dlBtn.download = `${storyUsername}_story_${index + 1}.mp4`;
+ dlBtn.href = '/api/img?url=' + encodeURIComponent(videoSrc);
+ dlBtn.download = storyUsername + '_story_' + (index + 1) + '.mp4';
  } else if (story.is_video && !videoSrc) {
- // Video but no URL - show image with note
- mediaDiv.innerHTML = `<div style="text-align:center;"><img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}" style="max-width:100%;max-height:70vh;border-radius:12px;"><p style="color:#999;margin-top:12px;">Video preview — tap Download for full video</p></div>`;
- dlBtn.href = `/api/img?url=${encodeURIComponent(story.display_url)}`;
- dlBtn.download = `${storyUsername}_story_${index + 1}.jpg`;
+ mediaDiv.innerHTML = '<div style="text-align:center;"><img src="/api/img?url=' + encodeURIComponent(story.display_url) + '" alt="Story ' + (index + 1) + '" style="max-width:100%;max-height:70vh;border-radius:12px;"><p style="color:#999;margin-top:12px;">Video preview — tap Download for full video</p></div>';
+ dlBtn.href = '/api/img?url=' + encodeURIComponent(story.display_url);
+ dlBtn.download = storyUsername + '_story_' + (index + 1) + '.jpg';
  } else {
- mediaDiv.innerHTML = `<img src="/api/img?url=${encodeURIComponent(story.display_url)}" alt="Story ${index + 1}" style="max-width:100%;max-height:80vh;border-radius:12px;">`;
- dlBtn.href = `/api/img?url=${encodeURIComponent(story.display_url)}`;
- dlBtn.download = `${storyUsername}_story_${index + 1}.jpg`;
+ mediaDiv.innerHTML = '<img src="/api/img?url=' + encodeURIComponent(story.display_url) + '" alt="Story ' + (index + 1) + '" style="max-width:100%;max-height:80vh;border-radius:12px;">';
+ dlBtn.href = '/api/img?url=' + encodeURIComponent(story.display_url);
+ dlBtn.download = storyUsername + '_story_' + (index + 1) + '.jpg';
  }
  
- counter.textContent = `Story ${index + 1} of ${storiesData.length}`;
+ counter.textContent = 'Story ' + (index + 1) + ' of ' + storiesData.length;
 }
 
 // Keyboard nav
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', function(e) {
  if (document.getElementById('storyFullscreen').style.display === 'none') return;
  if (e.key === 'Escape') closeStory();
  if (e.key === 'ArrowRight') nextStoryFs();

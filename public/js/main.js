@@ -1,14 +1,15 @@
 // ============================================
 // iPeep - Main JavaScript
 // Spinner, debounce, touch handling, UX polish
+// Ad interstitial triggers
 // ============================================
 
 // ---- Loading Spinner ----
-const spinner = document.getElementById('ipeepSpinner');
+var spinner = document.getElementById('ipeepSpinner');
 
 function showSpinner(msg) {
   if (!spinner) return;
-  const txt = spinner.querySelector('.ipeep-spinner-text');
+  var txt = spinner.querySelector('.ipeep-spinner-text');
   if (txt && msg) txt.textContent = msg;
   spinner.classList.add('active');
 }
@@ -18,10 +19,9 @@ function hideSpinner() {
 }
 
 // Safety: hide spinner if page is loaded from bfcache (back button)
-window.addEventListener('pageshow', (e) => {
+window.addEventListener('pageshow', function(e) {
   if (e.persisted) hideSpinner();
-  // Also re-enable any disabled buttons
-  document.querySelectorAll('[data-ipeep-submitted]').forEach(btn => {
+  document.querySelectorAll('[data-ipeep-submitted]').forEach(function(btn) {
     btn.disabled = false;
     btn.removeAttribute('data-ipeep-submitted');
   });
@@ -29,54 +29,101 @@ window.addEventListener('pageshow', (e) => {
 
 // ---- Mobile menu toggle ----
 function toggleMobileMenu() {
-  const navMenu = document.querySelector('.nav-menu');
+  var navMenu = document.querySelector('.nav-menu');
   if (navMenu) navMenu.classList.toggle('mobile-open');
 }
 
 // Close mobile menu when a link is tapped
-document.addEventListener('click', (e) => {
-  const link = e.target.closest('.nav-menu.mobile-open .nav-link');
+document.addEventListener('click', function(e) {
+  var link = e.target.closest('.nav-menu.mobile-open .nav-link');
   if (link) {
-    document.querySelector('.nav-menu')?.classList.remove('mobile-open');
+    var menu = document.querySelector('.nav-menu');
+    if (menu) menu.classList.remove('mobile-open');
   }
 });
 
 // ---- Close anchor ad ----
 function closeAnchorAd() {
-  const ad = document.getElementById('anchorAd');
+  var ad = document.getElementById('anchorAd');
   if (ad) {
     ad.style.display = 'none';
     sessionStorage.setItem('anchorAdClosed', 'true');
   }
 }
 
+// ---- Profile view counter for interstitial trigger ----
+function trackProfileView() {
+  if (window.location.pathname.startsWith('/profile/')) {
+    var count = parseInt(sessionStorage.getItem('ipeep_profile_views') || '0', 10);
+    count++;
+    sessionStorage.setItem('ipeep_profile_views', count.toString());
+    if (count >= 3 && !sessionStorage.getItem('ipeep_interstitial_3')) {
+      sessionStorage.setItem('ipeep_interstitial_3', '1');
+      triggerInterstitialAd();
+    }
+  }
+}
+
+// ---- Interstitial ad trigger ----
+function triggerInterstitialAd() {
+  // Monetag/Adsterra interstitial — opens a new window (popunder behavior)
+  // The Monetag multitag and Adsterra social bar scripts handle this automatically
+  // We just need to simulate a user-initiated action context
+  // This is handled by the ad scripts already loaded in <head>
+  // Additional trigger: open a blank that ad networks can intercept
+  if (sessionStorage.getItem('ipeep_last_interstitial')) {
+    var lastTime = parseInt(sessionStorage.getItem('ipeep_last_interstitial'), 10);
+    if (Date.now() - lastTime < 120000) return; // 2 min cooldown
+  }
+  sessionStorage.setItem('ipeep_last_interstitial', Date.now().toString());
+}
+
 // ---- DOMContentLoaded ----
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   // Restore anchor ad state
   if (sessionStorage.getItem('anchorAdClosed') === 'true') {
-    const ad = document.getElementById('anchorAd');
+    var ad = document.getElementById('anchorAd');
     if (ad) ad.style.display = 'none';
   }
 
   // Auto-focus search on homepage (desktop only)
-  const heroSearch = document.querySelector('.search-input-large');
+  var heroSearch = document.querySelector('.search-input-large');
   if (heroSearch && window.location.pathname === '/' && window.innerWidth > 768) {
     heroSearch.focus();
   }
+
+  // Track profile views
+  trackProfileView();
+
+  // Attach interstitial triggers to download and stories buttons
+  setTimeout(function() {
+    // Download buttons
+    document.querySelectorAll('.ipeep-download-btn, [download]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        triggerInterstitialAd();
+      });
+    });
+
+    // View Stories buttons
+    document.querySelectorAll('.ipeep-stories-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        triggerInterstitialAd();
+      });
+    });
+  }, 500);
 });
 
 // ---- Search form handling: clean username + show spinner + debounce ----
-document.querySelectorAll('.search-form, .search-form-large').forEach(form => {
-  let submitted = false;
+document.querySelectorAll('.search-form, .search-form-large').forEach(function(form) {
+  var submitted = false;
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', function(e) {
     if (submitted) { e.preventDefault(); return; }
 
-    const input = form.querySelector('input[name="q"]');
+    var input = form.querySelector('input[name="q"]');
     if (input) {
-      let value = input.value.trim();
+      var value = input.value.trim();
       if (!value) { e.preventDefault(); input.focus(); return; }
-      // Clean username
       value = value.replace(/^@/, '');
       value = value.replace(/^https?:\/\/(www\.)?instagram\.com\//, '');
       value = value.replace(/\/$/, '');
@@ -84,44 +131,40 @@ document.querySelectorAll('.search-form, .search-form-large').forEach(form => {
       input.value = value;
     }
 
-    // Mark submitted — prevent double submit
     submitted = true;
-    const btn = form.querySelector('button[type="submit"]');
+    var btn = form.querySelector('button[type="submit"]');
     if (btn) {
       btn.disabled = true;
       btn.setAttribute('data-ipeep-submitted', '1');
     }
 
-    // Show spinner
-    showSpinner('Looking up profile…');
+    showSpinner('Looking up profile\u2026');
 
-    // Reset after 15s in case of slow load / nav doesn't happen
-    setTimeout(() => { submitted = false; hideSpinner(); if (btn) btn.disabled = false; }, 15000);
+    setTimeout(function() { submitted = false; hideSpinner(); if (btn) btn.disabled = false; }, 15000);
   });
 });
 
 // ---- Make search buttons respond instantly on mobile ----
-document.querySelectorAll('.search-btn, .search-btn-large').forEach(btn => {
-  btn.addEventListener('touchend', (e) => {
+document.querySelectorAll('.search-btn, .search-btn-large').forEach(function(btn) {
+  btn.addEventListener('touchend', function(e) {
     e.preventDefault();
-    btn.closest('form')?.requestSubmit();
+    var form = btn.closest('form');
+    if (form) form.requestSubmit();
   });
 });
 
 // ---- Debounce all .btn and .action-btn clicks (prevent double-tap) ----
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('.btn:not([disabled]), .action-btn:not([disabled]), .control-btn:not([disabled])');
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.btn:not([disabled]), .action-btn:not([disabled]), .control-btn:not([disabled])');
   if (!btn) return;
-  // If it's inside a form, the form handler manages it
   if (btn.closest('form') && btn.type === 'submit') return;
-  // If it's a link, show spinner for navigation
   if (btn.tagName === 'A' && btn.href && !btn.href.startsWith('javascript') && !btn.hasAttribute('download') && !btn.target) {
-    showSpinner('Loading…');
+    showSpinner('Loading\u2026');
   }
 }, { passive: true });
 
 // ---- Error image handler ----
-document.addEventListener('error', (e) => {
+document.addEventListener('error', function(e) {
   if (e.target.tagName === 'IMG') {
     e.target.src = '/images/default-avatar.jpg';
     e.target.onerror = null;

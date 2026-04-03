@@ -58,7 +58,6 @@
  <p>Your browser does not support the video element.</p>
  </video>
  <div class="media-type-indicator video">
- <span class="icon"></span>
  <span class="label">Video</span>
  </div>
  </div>
@@ -68,7 +67,6 @@
  alt="Post by <%= post.owner.username %>" 
  class="post-image">
  <div class="media-type-indicator photo">
- <span class="icon"></span>
  <span class="label">Photo</span>
  </div>
  </div>
@@ -79,20 +77,13 @@
  <div class="post-stats">
  <div class="stats-row">
  <div class="stat-item">
- <span class="stat-icon"></span>
  <span class="stat-number"><%= seo.formatCount(post.likes_count) %></span>
  <span class="stat-label">Likes</span>
  </div>
  
  <div class="stat-item">
- <span class="stat-icon"></span>
  <span class="stat-number"><%= seo.formatCount(post.comments_count) %></span>
  <span class="stat-label">Comments</span>
- </div>
- 
- <div class="stat-item">
- <span class="stat-icon"></span>
- <span class="stat-number">Share</span>
  </div>
  </div>
  </div>
@@ -110,13 +101,11 @@
  <!-- Post Actions -->
  <div class="post-actions">
  <button onclick="downloadPost('<%= post.shortcode %>', '<%= post.is_video ? post.video_url : post.display_url %>', '<%= post.owner.username %>', <%= post.is_video %>)" 
- class="action-btn download-btn">
- <span class="btn-icon"></span>
+ class="action-btn download-btn ipeep-download-btn">
  <span class="btn-text">Download</span>
  </button>
  
  <button onclick="sharePost('<%= post.shortcode %>')" class="action-btn share-btn">
- <span class="btn-icon"></span>
  <span class="btn-text">Share</span>
  </button>
  
@@ -124,14 +113,18 @@
  target="_blank" 
  rel="noopener" 
  class="action-btn instagram-btn">
- <span class="btn-icon"></span>
  <span class="btn-text">View on Instagram</span>
  </a>
  
  <button onclick="copyPostLink('<%= post.shortcode %>')" class="action-btn copy-btn">
- <span class="btn-icon"></span>
  <span class="btn-text">Copy Link</span>
  </button>
+ </div>
+
+ <!-- Adsterra Native Banner - Below Post Actions -->
+ <div style="text-align:center;margin:24px 0;">
+ <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
+ <div id="container-post-7b466dd839b40ecfeb07def8c857f3b2"></div>
  </div>
  
  <!-- Post Information -->
@@ -166,7 +159,7 @@
  <div class="related-posts">
  <h3 class="related-title">More from @<%= post.owner.username %></h3>
  <div class="related-posts-grid">
- <% relatedPosts.forEach((relatedPost, index) => { %>
+ <% relatedPosts.forEach(function(relatedPost, index) { %>
  <div class="related-post">
  <a href="/post/<%= relatedPost.shortcode %>" class="related-link">
  <img src="<%= relatedPost.thumbnail_url || relatedPost.display_url %>" 
@@ -189,17 +182,6 @@
  </div>
  </a>
  </div>
- 
- <!-- Ad after 3 related posts -->
- <% if (config.ADS.ENABLE_ADS && index === 2 && relatedPosts.length > 3) { %>
- <div class="ad-slot ad-related" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>">
- <div class="ad-label">Advertisement</div>
- <ins class="adsbygoogle"
- style="display:block;width:100%;height:200px"
- data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
- data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_INFEED %>"></ins>
- </div>
- <% } %>
  <% }) %>
  </div>
  </div>
@@ -208,14 +190,11 @@
  
  <!-- Sidebar -->
  <div class="post-sidebar">
- <!-- Sidebar Ad -->
+ <!-- Adsterra Native Banner - Sidebar -->
  <% if (config.ADS.ENABLE_ADS) { %>
- <div class="ad-slot ad-sidebar" data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>">
- <div class="ad-label">Advertisement</div>
- <ins class="adsbygoogle"
- style="display:inline-block;width:300px;height:250px"
- data-ad-client="<%= config.ADS.GOOGLE_ADSENSE_CLIENT %>"
- data-ad-slot="<%= config.ADS.GOOGLE_ADSENSE_SLOT_SIDEBAR %>"></ins>
+ <div class="ad-slot ad-sidebar" id="adsterra-sidebar-post">
+ <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
+ <div id="container-post-sidebar-7b466dd839b40ecfeb07def8c857f3b2"></div>
  </div>
  <% } %>
  
@@ -238,7 +217,7 @@
  </div>
  </a>
  <div class="author-actions">
- <a href="/stories/<%= post.owner.username %>" class="btn btn-outline">
+ <a href="/stories/<%= post.owner.username %>" class="btn btn-outline ipeep-stories-btn">
  View Stories
  </a>
  </div>
@@ -251,7 +230,7 @@
  <div class="sidebar-section">
  <h4 class="sidebar-title">Trending Profiles</h4>
  <div class="trending-list">
- <% trendingProfiles.forEach(item => { %>
+ <% trendingProfiles.forEach(function(item) { %>
  <div class="trending-item">
  <a href="/profile/<%= item.username %>" class="trending-link">
  <img src="<%= item.profile?.profile_pic_url || '/images/default-avatar.jpg' %>" 
@@ -305,10 +284,10 @@
 <!-- Post Actions Script -->
 <script>
 function downloadPost(shortcode, mediaUrl, username, isVideo) {
- const extension = isVideo ? 'mp4' : 'jpg';
- const filename = `${username}_${shortcode}.${extension}`;
+ var extension = isVideo ? 'mp4' : 'jpg';
+ var filename = username + '_' + shortcode + '.' + extension;
  
- const link = document.createElement('a');
+ var link = document.createElement('a');
  link.href = mediaUrl;
  link.download = filename;
  link.target = '_blank';
@@ -316,53 +295,48 @@ function downloadPost(shortcode, mediaUrl, username, isVideo) {
  link.click();
  document.body.removeChild(link);
  
- // Show success message
  showToast('Download started!', 'success');
 }
 
 function sharePost(shortcode) {
- const url = window.location.href;
- const text = `Check out this Instagram post on InstaViewer - Anonymous Instagram Viewer`;
+ var url = window.location.href;
+ var text = 'Check out this Instagram post on iPeep - Anonymous Instagram Viewer';
  
  if (navigator.share) {
- navigator.share({
- title: text,
- url: url
- });
+ navigator.share({ title: text, url: url });
  } else {
  copyPostLink(shortcode);
  }
 }
 
 function copyPostLink(shortcode) {
- const url = window.location.href;
- navigator.clipboard.writeText(url).then(() => {
+ var url = window.location.href;
+ navigator.clipboard.writeText(url).then(function() {
  showToast('Post link copied to clipboard!', 'success');
- }).catch(() => {
+ }).catch(function() {
  showToast('Failed to copy link', 'error');
  });
 }
 
 function copyToClipboard(elementId) {
- const element = document.getElementById(elementId);
+ var element = document.getElementById(elementId);
  element.select();
- element.setSelectionRange(0, 99999); // For mobile devices
+ element.setSelectionRange(0, 99999);
  
- navigator.clipboard.writeText(element.value).then(() => {
+ navigator.clipboard.writeText(element.value).then(function() {
  showToast('Copied to clipboard!', 'success');
- }).catch(() => {
+ }).catch(function() {
  document.execCommand('copy');
  showToast('Copied to clipboard!', 'success');
  });
 }
 
-function showToast(message, type = 'info') {
- // Create toast element
- const toast = document.createElement('div');
- toast.className = `toast toast-${type}`;
+function showToast(message, type) {
+ type = type || 'info';
+ var toast = document.createElement('div');
+ toast.className = 'toast toast-' + type;
  toast.textContent = message;
  
- // Style the toast
  Object.assign(toast.style, {
  position: 'fixed',
  top: '20px',
@@ -379,11 +353,10 @@ function showToast(message, type = 'info') {
  
  document.body.appendChild(toast);
  
- // Remove toast after 3 seconds
- setTimeout(() => {
+ setTimeout(function() {
  toast.style.opacity = '0';
  toast.style.transform = 'translateX(100%)';
- setTimeout(() => {
+ setTimeout(function() {
  document.body.removeChild(toast);
  }, 300);
  }, 3000);
@@ -391,72 +364,32 @@ function showToast(message, type = 'info') {
 
 // Image zoom functionality
 document.addEventListener('DOMContentLoaded', function() {
- const postImage = document.querySelector('.post-image');
+ var postImage = document.querySelector('.post-image');
  if (postImage) {
  postImage.addEventListener('click', function() {
- // Create fullscreen overlay
- const overlay = document.createElement('div');
+ var overlay = document.createElement('div');
  overlay.className = 'image-overlay';
- overlay.innerHTML = `
- <img src="${this.src}" alt="Full size image">
- <button class="close-overlay"></button>
- `;
+ overlay.innerHTML = '<img src="' + this.src + '" alt="Full size image"><button class="close-overlay">X</button>';
  
- // Style the overlay
  Object.assign(overlay.style, {
- position: 'fixed',
- top: '0',
- left: '0',
- width: '100%',
- height: '100%',
- backgroundColor: 'rgba(0,0,0,0.9)',
- display: 'flex',
- alignItems: 'center',
- justifyContent: 'center',
- zIndex: '10000',
- cursor: 'pointer'
+ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+ backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center',
+ justifyContent: 'center', zIndex: '10000', cursor: 'pointer'
  });
  
- const overlayImage = overlay.querySelector('img');
- Object.assign(overlayImage.style, {
- maxWidth: '90%',
- maxHeight: '90%',
- objectFit: 'contain'
- });
+ var overlayImage = overlay.querySelector('img');
+ Object.assign(overlayImage.style, { maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' });
  
- const closeBtn = overlay.querySelector('.close-overlay');
+ var closeBtn = overlay.querySelector('.close-overlay');
  Object.assign(closeBtn.style, {
- position: 'absolute',
- top: '20px',
- right: '20px',
- background: 'rgba(255,255,255,0.2)',
- border: 'none',
- color: 'white',
- fontSize: '24px',
- width: '40px',
- height: '40px',
- borderRadius: '50%',
- cursor: 'pointer'
+ position: 'absolute', top: '20px', right: '20px', background: 'rgba(255,255,255,0.2)',
+ border: 'none', color: 'white', fontSize: '24px', width: '40px', height: '40px',
+ borderRadius: '50%', cursor: 'pointer'
  });
  
- // Close overlay on click
- overlay.addEventListener('click', () => {
- document.body.removeChild(overlay);
- });
- 
+ overlay.addEventListener('click', function() { document.body.removeChild(overlay); });
  document.body.appendChild(overlay);
  });
  }
 });
 </script>
-
-<!-- Initialize ads -->
-<% if (config.ADS.ENABLE_ADS) { %>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
- setTimeout(function() {
- (adsbygoogle = window.adsbygoogle || []).push({});
- }, 1000);
-});
-</script>
-<% } %>
