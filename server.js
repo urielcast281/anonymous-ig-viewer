@@ -24,28 +24,7 @@ const app = express();
 
 // Security
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "ui-avatars.com"],
-      fontSrc: ["'self'", "fonts.gstatic.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'",
-        "*.googleadservices.com", "*.googlesyndication.com", "*.googletagmanager.com",
-        "www.google-analytics.com", "www.googletagmanager.com",
-        "*.adsterra.com", "*.propellerads.com", "*.monetag.com",
-        "*.effectivegatecpm.com", "*.profitablegatecpm.com",
-        "quge5.com", "*.quge5.com"],
-      scriptSrcAttr: ["'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "blob:", "*.cdninstagram.com", "*.fbcdn.net",
-        "scontent.cdninstagram.com", "*.googleapis.com", "*.adsterra.com",
-        "*.effectivegatecpm.com", "picsum.photos", "ui-avatars.com", "*.picsum.photos"],
-      mediaSrc: ["'self'", "blob:", "*.cdninstagram.com", "*.fbcdn.net"],
-      connectSrc: ["'self'", "*.google-analytics.com", "*.adsterra.com",
-        "*.effectivegatecpm.com", "*.profitablegatecpm.com", "*.quge5.com"],
-      frameSrc: ["'self'", "*.googlesyndication.com", "*.adsterra.com",
-        "*.effectivegatecpm.com", "*.profitablegatecpm.com"],
-    },
-  },
+  contentSecurityPolicy: false,  // Disabled — ad networks (Adsterra/Monetag) use rotating domains that can't be whitelisted
 }));
 
 app.use(compression());
