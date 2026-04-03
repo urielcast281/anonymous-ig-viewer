@@ -277,15 +277,21 @@ class InstagramMobileAPI {
     const reel = data.reels?.[userId] || data.reels_media?.[0];
     if (!reel?.items?.length) return [];
     
-    return reel.items.map((item, i) => ({
-      id: String(item.pk || item.id),
-      type: item.media_type === 2 ? 'video' : 'image',
-      display_url: item.image_versions2?.candidates?.[0]?.url || '',
-      video_url: item.video_versions?.[0]?.url || null,
-      is_video: item.media_type === 2,
-      timestamp: item.taken_at || (Date.now() / 1000 - i * 3600),
-      expires_at: item.expiring_at || (Date.now() / 1000 + 86400),
-    }));
+    return reel.items.map((item, i) => {
+      const hasVideo = !!(item.video_versions?.length);
+      const isVideo = item.media_type === 2 || hasVideo;
+      const videoUrl = item.video_versions?.[0]?.url || null;
+      console.log(`📱 Story ${i}: media_type=${item.media_type}, hasVideoVersions=${hasVideo}, video_url=${videoUrl ? 'YES (' + videoUrl.substring(0, 60) + '...)' : 'null'}`);
+      return {
+        id: String(item.pk || item.id),
+        type: isVideo ? 'video' : 'image',
+        display_url: item.image_versions2?.candidates?.[0]?.url || '',
+        video_url: videoUrl,
+        is_video: isVideo,
+        timestamp: item.taken_at || (Date.now() / 1000 - i * 3600),
+        expires_at: item.expiring_at || (Date.now() / 1000 + 86400),
+      };
+    });
   }
 
   async getReels(userId, count = 12) {
