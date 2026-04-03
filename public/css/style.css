@@ -2238,30 +2238,19 @@ ul { list-style: none; }
 .ticker-bar {
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(90deg, #833AB4, #E1306C, #F77737, #FCAF45, #833AB4);
-  background-size: 200% 100%;
-  animation: tickerGradient 4s linear infinite;
-  padding: 10px 0;
+  background: #0a0a0a;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 8px 0;
   position: relative;
   z-index: 10;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-@keyframes tickerGradient {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
 }
 
 .ticker-track {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  flex-wrap: nowrap;
   white-space: nowrap;
-  animation: tickerScroll 25s linear infinite;
-  width: max-content;
-}
-
-.ticker-track:hover {
-  animation-play-state: paused;
+  animation: tickerScroll 30s linear infinite;
 }
 
 @keyframes tickerScroll {
@@ -2270,26 +2259,26 @@ ul { list-style: none; }
 }
 
 .ticker-item {
-  color: white;
+  color: #E1306C;
   font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 0 24px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  padding: 0 20px;
+  flex-shrink: 0;
 }
 
 .ticker-dot {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.8);
+  background: #833AB4;
   display: inline-block;
   flex-shrink: 0;
 }
 
 .ticker-track-reverse {
-  animation: tickerScrollReverse 25s linear infinite;
+  animation: tickerScrollReverse 30s linear infinite;
 }
 
 @keyframes tickerScrollReverse {
@@ -2298,6 +2287,10 @@ ul { list-style: none; }
 }
 
 .ticker-bar-bottom {
-  background: linear-gradient(90deg, #405DE6, #5851DB, #833AB4, #C13584, #405DE6);
-  background-size: 200% 100%;
+  border-bottom: none;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.ticker-bar-bottom .ticker-item {
+  color: #FCAF45;
 }
