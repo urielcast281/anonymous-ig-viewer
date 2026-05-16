@@ -102,7 +102,8 @@ ul { list-style: none; }
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 1000;
 }
 
@@ -519,6 +520,11 @@ ul { list-style: none; }
   opacity: 0.5;
 }
 
+.btn-stories-toggle {
+  margin-top: 8px;
+  width: 100%;
+}
+
 /* ============================================
    TRENDING / PROFILE CARDS
    ============================================ */
@@ -727,36 +733,36 @@ ul { list-style: none; }
    PROFILE PAGE
    ============================================ */
 .profile-container {
-  padding: 32px 0;
+  padding: 40px 0;
 }
 
 .profile-layout {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 32px;
+  gap: 40px;
 }
 
 .profile-main .profile-header {
   display: flex;
-  gap: 32px;
-  padding: 32px;
+  gap: 40px;
+  padding: 40px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  align-items: flex-start;
 }
 
 .profile-avatar-section {
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-shrink: 0;
+  width: 180px;
 }
 
 .profile-avatar-wrapper {
   position: relative;
   display: inline-block;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .profile-avatar-large {
@@ -770,11 +776,13 @@ ul { list-style: none; }
 }
 
 .stories-ring {
-  display: inline-block;
-  padding: 8px 16px;
+  display: block;
+  padding: 10px 20px;
   border-radius: var(--radius-full);
   font-size: 0.85rem;
   font-weight: 600;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .stories-ring.active {
@@ -794,30 +802,126 @@ ul { list-style: none; }
 .stories-link {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+}
+
+/* Inline Stories Section */
+.inline-stories-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.inline-stories-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.inline-stories-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.inline-stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.inline-story-item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 9/16;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inline-story-item:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-md);
+}
+
+.inline-story-item img,
+.inline-story-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inline-story-item .story-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 12px;
+}
+
+.inline-story-item .story-timestamp {
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.inline-stories-close {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.inline-stories-close:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
 }
 
 .profile-info-section {
   flex: 1;
+  min-width: 0;
 }
 
 .profile-info-section .profile-username {
   font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  word-break: break-word;
 }
 
 .profile-info-section .profile-fullname {
   color: var(--text-secondary);
   font-size: 1rem;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-weight: 400;
 }
 
 .profile-info-section .profile-stats {
   display: flex;
   gap: 32px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .profile-info-section .stat {
@@ -825,48 +929,53 @@ ul { list-style: none; }
 }
 
 .profile-bio {
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   font-size: 0.95rem;
-  line-height: 1.6;
+  line-height: 1.7;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .profile-website {
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .website-link {
   color: var(--accent-blue);
   font-size: 0.9rem;
+  word-break: break-all;
 }
 
 .profile-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
 .privacy-notice {
-  padding: 8px 16px;
+  padding: 10px 18px;
   background: rgba(252, 175, 69, 0.1);
   border: 1px solid rgba(252, 175, 69, 0.3);
   border-radius: var(--radius-full);
   color: var(--accent-yellow);
   font-size: 0.85rem;
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
 }
 
 /* ============================================
    POSTS GRID
    ============================================ */
 .posts-section {
-  margin-top: 8px;
+  margin-top: 32px;
 }
 
 .posts-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  gap: 12px;
 }
 
 .post-item {
@@ -2034,6 +2143,11 @@ ul { list-style: none; }
     align-items: center;
     text-align: center;
     padding: 24px 16px;
+    gap: 20px;
+  }
+
+  .profile-avatar-section {
+    width: 100%;
   }
   
   .profile-info-section .profile-stats {
@@ -2043,10 +2157,14 @@ ul { list-style: none; }
   .profile-actions {
     justify-content: center;
   }
+
+  .inline-stories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
   
   .posts-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
+    gap: 4px;
   }
   
   .search-results-grid {
@@ -2138,163 +2256,4 @@ ul { list-style: none; }
 ::selection {
   background: var(--accent-pink);
   color: white;
-}
-
-/* ============================================
-   LOADING SPINNER — Neon Rainbow
-   ============================================ */
-.ipeep-spinner-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.ipeep-spinner-overlay.active {
-  display: flex;
-}
-
-.ipeep-spinner {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 4px solid transparent;
-  border-top-color: #f09433;
-  border-right-color: #e6683c;
-  border-bottom-color: #dc2743;
-  border-left-color: #bc1888;
-  animation: ipeep-spin 0.8s linear infinite, ipeep-glow 2s ease-in-out infinite;
-}
-
-.ipeep-spinner-text {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
-@keyframes ipeep-spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes ipeep-glow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(225, 48, 108, 0.4), 0 0 30px rgba(131, 58, 180, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(252, 175, 69, 0.5), 0 0 50px rgba(225, 48, 108, 0.3);
-  }
-}
-
-/* ============================================
-   BUTTON / FORM POLISH
-   ============================================ */
-.btn, .action-btn, .control-btn, .search-btn, .search-btn-large, .story-download-btn, .tool-btn {
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.btn:active, .action-btn:active, .control-btn:active, .search-btn-large:active {
-  transform: scale(0.97);
-  opacity: 0.85;
-}
-
-.btn[disabled], .search-btn-large[disabled] {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* ============================================
-   TEXT OVERFLOW SAFETY
-   ============================================ */
-.profile-username, .user-username, .profile-fullname, .user-fullname,
-.profile-bio p, .caption-text, .author-username, .hero-title,
-.related-username, .trending-username, .metadata-value, .info-value {
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.user-username, .profile-username, .related-username, .trending-username {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.profile-info-section .profile-username {
-  white-space: normal;
-}
-
-/* ============================================
-   Scrolling Ticker Banner
-   ============================================ */
-/* ─── News Ticker (Marquee) ─── */
-.ticker-bar {
-  overflow: hidden;
-  background: rgba(0,0,0,0.6);
-  border-bottom: 1px solid rgba(131,58,180,0.3);
-  padding: 0.4rem 0;
-  white-space: nowrap;
-}
-
-.ticker-track {
-  display: inline-block;
-  white-space: nowrap;
-  animation: tickerScroll 30s linear infinite;
-}
-
-.ticker-track:hover {
-  animation-play-state: paused;
-}
-
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.ticker-item {
-  display: inline-block;
-  padding: 0 2rem;
-  color: rgba(255,255,255,0.6);
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
-}
-
-.ticker-item .ticker-highlight {
-  color: #E1306C;
-  font-weight: 700;
-}
-
-.ticker-item .ticker-gold {
-  color: #FCAF45;
-}
-
-.ticker-separator {
-  display: inline-block;
-  color: rgba(131,58,180,0.5);
-  padding: 0 0.5rem;
-}
-
-.ticker-track-reverse {
-  animation: tickerScrollReverse 30s linear infinite;
-}
-
-@keyframes tickerScrollReverse {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
-}
-
-.ticker-bar-bottom {
-  border-bottom: none;
-  border-top: 1px solid rgba(131,58,180,0.3);
 }
