@@ -17,7 +17,7 @@
                         
                         <!-- Stories Button (inline instead of link to separate page) -->
                         <% if (stories && stories.stories && stories.stories.length > 0) { %>
-                        <button class="btn btn-primary btn-stories-toggle" onclick="toggleInlineStories('<%= username %>')" id="storiesBtn">
+                        <button class="btn btn-primary btn-stories-toggle" onclick="toggleInlineStories('<%= username %>')" id="storiesBtn" data-count="<%= stories.stories.length %>">
                             📸 View Stories (<%= stories.stories.length %>)
                         </button>
                         <% } else { %>
@@ -96,10 +96,9 @@
                     </div>
                 </div>
                 
-                <!-- Adsterra Native Banner - Mid Content -->
-                <div class="ad-slot ad-native-mid" style="margin: 20px 0;">
-                    <script async="async" data-cfasync="false" src="https://pl28773008.effectivegatecpm.com/7b466dd839b40ecfeb07def8c857f3b2/invoke.js"></script>
-                    <div id="container-7b466dd839b40ecfeb07def8c857f3b2"></div>
+                <!-- Ad: Mid-content (Monetag) -->
+                <div class="ad-slot ad-native-mid" style="margin: 20px 0; text-align: center;">
+                    <script async="async" src="https://quge5.com/88/tag.min.js" data-zone="213550" data-cfasync="false"></script>
                 </div>
 
                 <!-- Posts Section -->

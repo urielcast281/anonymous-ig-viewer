@@ -273,6 +273,7 @@ class SEOUtils {
 
   // Format numbers for display
   formatCount(count) {
+    if (count === null || count === undefined || isNaN(count)) return '0';
     if (count >= 1000000) {
       return (count / 1000000).toFixed(1) + 'M';
     } else if (count >= 1000) {

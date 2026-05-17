@@ -1,7 +1,7 @@
 <div class="error-container">
  <div class="container">
  <div class="error-message">
- <div class="empty-icon"><%= error.status === 404 ? '' : '' %></div>
+ <div class="empty-icon"><%= error.status === 404 ? '🔍' : '⚠️' %></div>
  <h2><%= error.status %> - <%= error.message %></h2>
  <% if (error.details) { %>
  <p style="white-space: pre-line;"><%= error.details %></p>

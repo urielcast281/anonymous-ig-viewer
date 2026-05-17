@@ -48,7 +48,16 @@ app.use(async (req, res, next) => {
     await rateLimiter.consume(req.ip);
     next();
   } catch {
-    res.status(429).json({ error: 'Too Many Requests', message: 'Please try again later' });
+    if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      res.status(429).json({ error: 'Too Many Requests', message: 'Please try again later' });
+    } else {
+      res.status(429).render('error', {
+        error: { status: 429, message: 'Too Many Requests', details: 'You\'ve made too many requests. Please wait a moment and try again.' },
+        title: 'Rate Limited',
+        description: 'Too many requests',
+        metaData: seo.getHomeMeta()
+      });
+    }
   }
 });
 
